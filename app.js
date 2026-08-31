@@ -289,8 +289,8 @@
   }
 
   function renderChrome() {
-    $("titleEn").textContent = state.lang === "th" ? "ควอนตัมไวบ์" : "Quantum Vibe";
-    $("titleTh").textContent = state.lang === "th" ? "Quantum Vibe" : "ควอนตัมไวบ์";
+    $("titleTh").textContent = "ทดลองควอนตัม.com";
+    $("titleEn").textContent = "Try Quantum";
     $("sub").textContent = t("sub");
     $("honesty").textContent = t("honesty");
     $("promptLabel").textContent = t("promptLabel");
@@ -458,6 +458,10 @@
       "<div class='close-row'><button class='btn' type='button' id='btnCloseSettings'>" + t("close") + "</button></div>";
     $("btnCloseSettings").addEventListener("click", function () { closeSettings(); });
     $("btnOriginTest").addEventListener("click", testOriginKey);
+    $("moonshotKey").addEventListener("input", function () {
+      state.moonshotKey = $("moonshotKey").value || "";
+      localStorage.setItem(MOONSHOT_KEY, state.moonshotKey);
+    });
     $("moonshotKey").addEventListener("change", function () {
       state.moonshotKey = $("moonshotKey").value || "";
       localStorage.setItem(MOONSHOT_KEY, state.moonshotKey);
