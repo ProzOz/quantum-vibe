@@ -1,0 +1,2 @@
+qpanda3-runtime==1.0.2
+pyqpanda3>=0.4.0
