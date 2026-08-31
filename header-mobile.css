@@ -1,0 +1,104 @@
+/* Mobile app bar: keep the Thai wordmark on one line.
+   Loaded after styles.css so these rules win without rewriting the rest. */
+
+header.appbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+.header-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+.header-seals {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.header-seal {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+}
+.brand {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.brand h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-name { display: inline; }
+.brand .sub {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.header-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  flex: 0 1 auto;
+  margin-left: auto;
+}
+.sister-link {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.85rem;
+  padding: 0 6px;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+}
+.sister-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.lang, .about-btn {
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--chip);
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .header-seal { height: 22px; }
+  .brand h1 { font-size: 1.05rem; }
+  .sister-link { display: none; }
+  .lang, .about-btn {
+    padding: 0 10px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .header-identity {
+    flex: 1 1 100%;
+  }
+  .header-tools {
+    flex: 1 1 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+}
