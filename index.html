@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Quantum Vibe / ควอนตัมไวบ์</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="appbar">
+      <div class="brand">
+        <h1><span id="titleEn">Quantum Vibe</span> / <span id="titleTh">ควอนตัมไวบ์</span></h1>
+        <div class="sub" id="sub"></div>
+      </div>
+      <button type="button" class="lang" id="btnEn" aria-pressed="true">EN</button>
+      <button type="button" class="lang" id="btnTh" aria-pressed="false">TH</button>
+      <button type="button" class="about-btn" id="btnSettings">Settings</button>
+      <button type="button" class="about-btn" id="btnAbout">About</button>
+    </header>
+
+    <p class="honesty" id="honesty"></p>
+
+    <section class="panel">
+      <label class="prompt-label" for="prompt" id="promptLabel"></label>
+      <textarea id="prompt" rows="3"></textarea>
+      <p class="examples-label" id="examplesLabel"></p>
+      <ul class="examples" id="examples"></ul>
+      <div class="chips" id="chips"></div>
+      <div class="actions">
+        <button type="button" class="btn primary" id="btnRun">Run</button>
+        <button type="button" class="btn" id="btnRegen" disabled>Regenerate</button>
+        <button type="button" class="btn" id="btnCopy" disabled>Copy code</button>
+      </div>
+    </section>
+
+    <section class="panel" id="results">
+      <p class="empty" id="empty"></p>
+    </section>
+  </div>
+
+  <div class="drawer-backdrop" id="about">
+    <aside class="drawer" role="dialog" aria-labelledby="aboutInner">
+      <div id="aboutInner"></div>
+    </aside>
+  </div>
+
+  <div class="drawer-backdrop" id="settings">
+    <aside class="drawer" role="dialog" aria-labelledby="settingsInner">
+      <div id="settingsInner"></div>
+    </aside>
+  </div>
+
+  <div class="drawer-backdrop" id="wukongModal">
+    <aside class="confirm-card" role="dialog" aria-labelledby="wukongModalTitle">
+      <div id="wukongModalInner"></div>
+    </aside>
+  </div>
+
+  <script src="sim.js"></script>
+  <script src="demos.js"></script>
+  <script src="validate.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

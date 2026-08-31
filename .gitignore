@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.env
+.env.*
+_inspect_qpanda.py
+_inspect_qpanda2.py
+about-desktop.png
+about-phone.png
+logos/_src/
