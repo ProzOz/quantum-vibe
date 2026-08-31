@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Quantum Vibe local proxy. Holds MOONSHOT_API_KEY from the environment.
-# Browser talks only to 127.0.0.1. Never logs the key or request bodies.
-"""Quantum Vibe local planner proxy (stdlib only)."""
+# ทดลองควอนตัม.com proxy. Visitors paste their own API keys in Settings.
+# Never logs keys or request bodies. Origin routes need qpanda3-runtime.
+"""ทดลองควอนตัม.com planner proxy (stdlib only)."""
 
 from __future__ import annotations
 
@@ -20,8 +20,8 @@ from urllib.request import Request, urlopen
 
 
 ROOT = Path(__file__).resolve().parent
-PORT = 8787
-HOST = "127.0.0.1"
+PORT = int(os.environ.get("PORT", "3000"))
+HOST = os.environ.get("HOST", "0.0.0.0")
 DEFAULT_MODEL = "kimi-k3"
 DEFAULT_BASE = "https://api.moonshot.ai"
 ALLOWED_HOSTS = frozenset(("api.moonshot.ai", "api.moonshot.cn"))
@@ -787,10 +787,12 @@ def origin_job(key: str, job_id: Any, n_qubits: Any) -> dict:
 
 
 def key_present() -> bool:
+    """Check if owner env key is present. Not used for visitor keys."""
     return bool(os.environ.get("MOONSHOT_API_KEY"))
 
 
 def _get_key() -> str:
+    """Get owner env key. Not used for visitor keys."""
     return os.environ.get("MOONSHOT_API_KEY") or ""
 
 
@@ -964,9 +966,8 @@ def normalize_model(model: Any) -> str:
     return m
 
 
-def moonshot_chat(prompt: str, endpoint: str, model: str) -> dict:
+def moonshot_chat(prompt: str, endpoint: str, model: str, key: str) -> dict:
     """Call Moonshot once. Returns {ok, content} or {ok: False, error, status}."""
-    key = _get_key()
     payload = {
         "model": model,
         "messages": [
@@ -1027,11 +1028,11 @@ def moonshot_chat(prompt: str, endpoint: str, model: str) -> dict:
     return result
 
 
-def plan_from_kimi(prompt: str, endpoint: str, model: str) -> dict:
+def plan_from_kimi(prompt: str, endpoint: str, model: str, key: str) -> dict:
     """One user request: call Kimi, parse JSON. Retry at most once on network/parse fail."""
     last_err = "Kimi request failed"
     for attempt in range(2):
-        result = moonshot_chat(prompt, endpoint, model)
+        result = moonshot_chat(prompt, endpoint, model, key)
         if not result.get("ok"):
             last_err = result.get("error") or last_err
             # Retry network-ish failures only.
@@ -1094,7 +1095,6 @@ class Handler(SimpleHTTPRequestHandler):
                 {
                     "ok": True,
                     "proxy": True,
-                    "key_present": key_present(),
                     "qpanda_present": qpanda_present(),
                 },
             )
@@ -1115,9 +1115,6 @@ class Handler(SimpleHTTPRequestHandler):
         if path != "/plan":
             self._send_json(404, {"error": "not found"})
             return
-        if not key_present():
-            self._send_json(503, {"error": "MOONSHOT_API_KEY missing"})
-            return
         try:
             body = self._read_json_body()
         except Exception:
@@ -1125,6 +1122,13 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if not isinstance(body, dict):
             self._send_json(400, {"error": "request body must be a JSON object"})
+            return
+        moonshot_key = body.get("moonshot_key")
+        if not isinstance(moonshot_key, str):
+            moonshot_key = ""
+        moonshot_key = moonshot_key.strip()
+        if not moonshot_key:
+            self._send_json(400, {"error": "moonshot_key is required. Paste your Moonshot API key in Settings."})
             return
         prompt = body.get("prompt")
         if not isinstance(prompt, str) or not prompt.strip():
@@ -1141,9 +1145,8 @@ class Handler(SimpleHTTPRequestHandler):
             self._send_json(400, {"error": str(e)})
             return
         try:
-            result = plan_from_kimi(prompt, endpoint, model)
+            result = plan_from_kimi(prompt, endpoint, model, moonshot_key)
         except Exception:
-            # Do not dump traceback that might include headers.
             self._send_json(502, {"error": "proxy failed calling Kimi"})
             return
         if not result.get("ok"):
@@ -1235,10 +1238,10 @@ class Handler(SimpleHTTPRequestHandler):
 def main() -> None:
     os.chdir(ROOT)
     # ThreadingHTTPServer = socketserver.ThreadingMixIn + HTTPServer (stdlib).
-    # A Origin poll must not freeze static files or /plan (Kimi).
+    # Origin poll must not freeze static files or /plan (Kimi).
     server = ThreadingHTTPServer((HOST, PORT), Handler)
-    print("Quantum Vibe proxy on http://%s:%d" % (HOST, PORT), flush=True)
-    print("key_present=%s" % ("true" if key_present() else "false"), flush=True)
+    print("ทดลองควอนตัม.com proxy on http://%s:%d" % (HOST, PORT), flush=True)
+    print("qpanda_present=%s" % ("true" if qpanda_present() else "false"), flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

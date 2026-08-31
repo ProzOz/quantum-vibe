@@ -1,62 +1,52 @@
-# Quantum Vibe / ควอนตัมไวบ์
+# ทดลองควอนตัม.com · Try Quantum
 
-Local teaching prototype. The browser talks **only** to a proxy on `127.0.0.1`. Circuits are simulated in the browser (1–4 qubits, statevector + shots). This does **not** claim quantum advantage. City-scale traffic and real drug screening are mapped to tiny teaching circuits.
+Teaching prototype running on Python proxy. Visitors paste **their own** Moonshot and Origin API keys in Settings. Circuits are simulated in the browser (1–4 qubits, statevector + shots). This does **not** claim quantum advantage.
 
-You do **not** need `file://`. Open the app through the proxy.
+The GitHub repo folder stays `quantum-vibe` (not renamed).
 
-## API key (placeholder only — never commit a real key)
+## For visitors (public Coolify deploy)
 
-The proxy reads `MOONSHOT_API_KEY` from the process environment. The key is never stored in HTML, JS, CSS, or this README.
+1. Open **ทดลองควอนตัม.com** (owner will bind this domain on Coolify after merge)
+2. Open **Settings**
+3. Paste **your Moonshot API key** (for Kimi K3 circuit generation)
+4. Paste **your Origin API key** (optional, for Wukong 180 real QPU)
+5. Keys stay in your browser only (`localStorage`). Never logged. Not stored on the server.
+6. Preset chips + in-browser sim work with **no keys**.
 
-Windows PowerShell:
+## Local development
 
-```powershell
-$env:MOONSHOT_API_KEY = "YOUR_MOONSHOT_KEY"
-```
-
-Windows Command Prompt (cmd):
-
-```cmd
-set MOONSHOT_API_KEY=YOUR_MOONSHOT_KEY
-```
-
-Then, in the same window:
-
-## Start the proxy
-
-```cmd
-cd C:\Users\Admin\quantum-vibe
-python proxy.py
+```bash
+cd /path/to/quantum-vibe
+HOST=127.0.0.1 PORT=8787 python proxy.py
 ```
 
 Open [http://127.0.0.1:8787](http://127.0.0.1:8787)
 
-- Default API base: `https://api.moonshot.ai` (Settings can switch to `https://api.moonshot.cn`)
-- Default model: `kimi-k3`
-- `GET /health` reports `{ok, proxy, key_present}` — boolean only, never the key
-- Free-text **Run** posts to `/plan` (one request; retry at most once on network/parse failure)
-- Preset chips run canned demos locally and do **not** call Kimi
-- If the key is missing, Kimi is down, or JSON is invalid: the app shows the error and offers presets as an explicit fallback. It never silently swaps in a canned demo.
+- Visitors paste keys in Settings (localStorage on their browser)
+- `GET /health` reports `{ok, proxy, qpanda_present}` — never reports keys
+- `POST /plan` requires `moonshot_key` in JSON body (client-provided, returns 400 if missing)
+- Origin routes (`/origin/test`, `/origin/sample`, `/origin/job`) take `key` from JSON body
 
-Python 3 stdlib only (`http.server` + `urllib`). Bind is `127.0.0.1:8787`.
+Python 3 stdlib only (`http.server` + `urllib`). HOST default `0.0.0.0`, PORT default `3000` (Coolify). Local can override with env.
 
 ## Origin Wukong 180 (optional)
 
 Local sim is the default. After a circuit exists, **ยิงเข้า Wukong 180 จริง** can submit OpenQASM to `WK_C180` at 256 shots. Confirm first. No auto-send.
 
-- Settings: Origin API key (password, `localStorage origin_key` on this machine only) and device id (default `WK_C180`)
+- Settings: Origin API key (password, `localStorage` on visitor's browser only) and device id (default `WK_C180`)
 - **Test key** calls `POST /origin/test` (login + list devices). No submit.
 - Submit is `POST /origin/sample` (async: returns `job_id` immediately, never waits on the chip). Browser polls `POST /origin/job` every 10s for up to 20 minutes. 256 shots. Proxy never logs the key.
 - A real chip queue can take many minutes. Local bars stay. Results are never faked.
+- Needs `qpanda3-runtime` and `pyqpanda3` at runtime (Dockerfile tries to install; local devs `pip install` manually).
 
-Restart `python proxy.py` in the same window that already has `MOONSHOT_API_KEY` so the new routes load.
+## Coolify deploy (public, on ทดลองควอนตัม.com)
 
-## Coolify (static demo)
+`Dockerfile` runs Python proxy on port **3000**. Coolify binds **ทดลองควอนตัม.com** to this app (separate from เรียนควอนตัม.com, which is `ProzOz/quantum-experience`).
 
-Same pattern as the other site: `Dockerfile` + `nginx` on port **3000**. In-browser 1–4 qubit sim and preset chips work with no API keys.
+**Owner must NOT set `MOONSHOT_API_KEY` or Origin keys as Coolify env.** Visitors paste keys in Settings.
 
-Kimi (`/plan`) and Origin Wukong stay on your machine via `python proxy.py` at `http://127.0.0.1:8787`. Do **not** put `MOONSHOT_API_KEY` or an Origin key on Coolify. Do **not** reuse เรียนควอนตัม.com.
+In-browser sim and preset chips work with no keys. Kimi needs a Moonshot key; Wukong needs an Origin key (both visitor-provided).
 
-After GitHub has `main`, add a Coolify app on this repo and **Redeploy** yourself.
+After merge, owner **Redeploys** Coolify with the new app pointing at this repo.
 
-This does not claim quantum advantage, real-QPU access from the public URL, users, or KMITL admission.
+This does not claim quantum advantage, real users, or KMITL admission.

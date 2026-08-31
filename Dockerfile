@@ -1,5 +1,8 @@
-FROM nginx:alpine
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-COPY . /usr/share/nginx/html
+FROM python:3.11-slim
+WORKDIR /app
+COPY . /app
+RUN pip install --no-cache-dir qpanda3-runtime pyqpanda3 || echo "qpanda install failed; Origin routes will not work"
 EXPOSE 3000
-CMD ["nginx", "-g", "daemon off;"]
+ENV HOST=0.0.0.0
+ENV PORT=3000
+CMD ["python", "proxy.py"]
