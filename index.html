@@ -6,24 +6,33 @@
   <meta name="color-scheme" content="dark">
   <title>ทดลองควอนตัม.com · Try Quantum</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="header-mobile.css">
 </head>
 <body>
   <div class="wrap">
     <header class="appbar">
-      <div class="header-seals">
-        <img src="logos/scius-buu-mark.png" alt="SCiUS BUU" class="header-seal">
-        <img src="logos/burapha-seal.png" alt="Burapha University" class="header-seal">
-        <img src="logos/piboonbumpen.png" alt="Piboonbumpen" class="header-seal">
+      <div class="header-identity">
+        <div class="header-seals">
+          <img src="logos/scius-buu-mark.png" alt="SCiUS BUU" class="header-seal">
+          <img src="logos/burapha-seal.png" alt="Burapha University" class="header-seal">
+          <img src="logos/piboonbumpen.png" alt="Piboonbumpen" class="header-seal">
+        </div>
+        <div class="brand">
+          <h1>
+            <span class="brand-name">ทดลองควอนตัม</span>
+            <span id="titleTh" hidden>ทดลองควอนตัม.com</span>
+            <span id="titleEn" hidden>Try Quantum</span>
+          </h1>
+          <div class="sub" id="sub"></div>
+        </div>
       </div>
-      <div class="brand">
-        <h1><span id="titleTh">ทดลองควอนตัม.com</span> · <span id="titleEn">Try Quantum</span></h1>
-        <div class="sub" id="sub"></div>
-      </div>
-      <a href="https://เรียนควอนตัม.com" target="_blank" rel="noopener" class="sister-link" id="sisterLink"></a>
-      <button type="button" class="lang" id="btnEn" aria-pressed="true">EN</button>
-      <button type="button" class="lang" id="btnTh" aria-pressed="false">TH</button>
-      <button type="button" class="about-btn" id="btnSettings">Settings</button>
-      <button type="button" class="about-btn" id="btnAbout">About</button>
+      <nav class="header-tools" aria-label="Language and settings">
+        <a href="https://เรียนควอนตัม.com" target="_blank" rel="noopener" class="sister-link" id="sisterLink"></a>
+        <button type="button" class="lang" id="btnEn" aria-pressed="true">EN</button>
+        <button type="button" class="lang" id="btnTh" aria-pressed="false">TH</button>
+        <button type="button" class="about-btn" id="btnSettings">Settings</button>
+        <button type="button" class="about-btn" id="btnAbout">About</button>
+      </nav>
     </header>
 
     <p class="honesty" id="honesty"></p>
