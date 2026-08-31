@@ -4,6 +4,7 @@
   var LANG_KEY = "qv-lang";
   var BASE_KEY = "qv-base-url";
   var MODEL_KEY = "qv-model";
+  var MOONSHOT_KEY = "moonshot_key";
   var ORIGIN_KEY = "origin_key";
   var ORIGIN_DEVICE_KEY = "origin_device";
   var DEFAULT_BASE = "https://api.moonshot.ai";
@@ -19,8 +20,8 @@
 
   var I18N = {
     en: {
-      title: "Quantum Vibe",
-      sub: "ควอนตัมไวบ์ · local teaching prototype",
+      title: "ทดลองควอนตัม.com",
+      sub: "Try Quantum · teaching prototype",
       honesty: "This app teaches with 1–4 qubit toys. Real chips are slow, expensive, and noisy — they do not beat a home computer.",
       promptLabel: "Describe a tiny circuit in Thai or English",
       placeholder: "e.g. dog or cat toy, Schrödinger cat, or two Hadamards…",
@@ -51,7 +52,12 @@
       ],
       proxyConnected: "proxy connected",
       proxyMissing: "proxy missing",
-      keyOnProxy: "Key is held by the local proxy (env MOONSHOT_API_KEY). It is never stored in this page.",
+      moonshotKey: "🔑 Moonshot API key (Kimi)",
+      moonshotKeyHint: "Visitor's browser only (localStorage). Sent to the proxy for Kimi. Never logged.",
+      moonshotKeyHow: "🗝️ How to get a Moonshot key",
+      moonshotKeyHow1: "🌐 Sign up at platform.moonshot.cn",
+      moonshotKeyHow2: "📋 Copy your API key and paste it above",
+      moonshotKeyHow3: "✅ The key stays in your browser only",
       apiBase: "API base URL",
       model: "Model",
       fallback: "Kimi did not produce a usable circuit. Preset chips below still run locally — they are canned demos, not a silent substitute for this prompt.",
@@ -62,7 +68,7 @@
       aboutSchool: "Currently enrolled, M.6 / Grade 12, SCiUS BUU (วมว.), Piboonbumpen Demonstration School, Burapha University. Bangsaen, Chonburi, Thailand.",
       aboutGoal: "2026 application goal (not admitted): B.Eng. Robotics and AI Engineering (International Program), Department of Robotics and AI Engineering, School of Engineering, KMITL.",
       aboutEndorsement: "No official endorsement by the school, SCiUS, Burapha University, or KMITL.",
-      aboutProduct: "Quantum Vibe / ควอนตัมไวบ์ is a local browser prototype. No verified collaborators. No real-QPU access, no user counts, no admission claim.",
+      aboutProduct: "ทดลองควอนตัม.com is a teaching prototype. Visitor keys in Settings. No owner keys on the server. No quantum advantage, no KMITL admission.",
       aboutName: "Chonlatee Sukwiwattanaporn (ชลธี สุขวิวัฒนพร)",
       aboutTarget: "B.Eng. Robotics and AI, KMITL (target)",
       aboutMore: "อ่านเพิ่ม / more",
@@ -125,8 +131,8 @@
       wukongMismatch: "จ็อบนี้เป็นคนละวงจร — ไม่แปะผลทับ"
     },
     th: {
-      title: "ควอนตัมไวบ์",
-      sub: "Quantum Vibe · ต้นแบบสอนบนเบราว์เซอร์เครื่องนี้",
+      title: "ทดลองควอนตัม.com",
+      sub: "ต้นแบบสอน · คีย์จากผู้เยี่ยมชม",
       honesty: "แอปนี้สอนด้วยของเล่น 1–4 ควิบิต ชิปจริงช้า แพง และมี noise — ไม่ได้ชนะคอมพิวเตอร์บ้าน",
       promptLabel: "พิมพ์วงจรจิ๋วเป็นไทยหรืออังกฤษ",
       placeholder: "เช่น ของเล่นหมา/แมว, แมวชโรดิงเงอร์, หรือ Hadamard สองครั้ง…",
@@ -157,7 +163,12 @@
       ],
       proxyConnected: "proxy connected",
       proxyMissing: "proxy missing",
-      keyOnProxy: "คีย์อยู่ที่พร็อกซีท้องถิ่น (ตัวแปรสภาพแวดล้อม MOONSHOT_API_KEY) ไม่ถูกเก็บในหน้านี้",
+      moonshotKey: "🔑 Moonshot API key (Kimi)",
+      moonshotKeyHint: "เก็บในเบราว์เซอร์เท่านั้น (localStorage) ส่งไปพร็อกซีสำหรับ Kimi ไม่ถูก log",
+      moonshotKeyHow: "🗝️ เอา Moonshot key ยังไง",
+      moonshotKeyHow1: "🌐 สมัครที่ platform.moonshot.cn",
+      moonshotKeyHow2: "📋 ก็อปปี้ API key แล้ววางในช่องด้านบน",
+      moonshotKeyHow3: "✅ คีย์อยู่ในเบราว์เซอร์เท่านั้น",
       apiBase: "API base URL",
       model: "โมเดล",
       fallback: "Kimi ไม่ได้ให้วงจรที่ใช้ได้ ชิป preset ด้านบนยังรันในเครื่องได้ — เป็นเดโมสำเร็จรูป ไม่ได้แอบแทนข้อความนี้",
@@ -168,7 +179,7 @@
       aboutSchool: "กำลังศึกษา ม.6 โปรแกรม SCiUS BUU (วมว.) โรงเรียนสาธิตพิบูลบำเพ็ญ มหาวิทยาลัยบูรพา บางแสน ชลบุรี ประเทศไทย",
       aboutGoal: "เป้าสมัครปี 2026 (ยังไม่ได้รับเข้า): B.Eng. Robotics and AI Engineering (International Program), Department of Robotics and AI Engineering, School of Engineering, KMITL",
       aboutEndorsement: "ไม่มีข้อความรับรองอย่างเป็นทางการจากโรงเรียน, SCiUS, มหาวิทยาลัยบูรพา หรือ KMITL",
-      aboutProduct: "ควอนตัมไวบ์ / Quantum Vibe เป็นต้นแบบบนเบราว์เซอร์ท้องถิ่น ไม่มีผู้ร่วมพัฒนาที่ยืนยันแล้ว ไม่มี QPU จริง ไม่มีจำนวนผู้ใช้ และไม่อ้างการรับเข้า",
+      aboutProduct: "ทดลองควอนตัม.com เป็นต้นแบบสอน คีย์จากผู้เยี่ยมชมใน Settings ไม่มีคีย์เจ้าของบนเซิร์ฟเวอร์ ไม่มี quantum advantage ไม่อ้างการรับเข้า KMITL",
       aboutName: "Chonlatee Sukwiwattanaporn (ชลธี สุขวิวัฒนพร)",
       aboutTarget: "B.Eng. Robotics and AI, KMITL (target)",
       aboutMore: "อ่านเพิ่ม / more",
@@ -242,6 +253,7 @@
     proxy: { ok: false, key_present: false, qpanda_present: false, checked: false },
     baseUrl: localStorage.getItem(BASE_KEY) || DEFAULT_BASE,
     model: localStorage.getItem(MODEL_KEY) || DEFAULT_MODEL,
+    moonshotKey: localStorage.getItem(MOONSHOT_KEY) || "",
     originKey: localStorage.getItem(ORIGIN_KEY) || "",
     originDevice: localStorage.getItem(ORIGIN_DEVICE_KEY) || DEFAULT_DEVICE,
     wukongBusy: false,
@@ -277,8 +289,8 @@
   }
 
   function renderChrome() {
-    $("titleEn").textContent = state.lang === "th" ? "ควอนตัมไวบ์" : "Quantum Vibe";
-    $("titleTh").textContent = state.lang === "th" ? "Quantum Vibe" : "ควอนตัมไวบ์";
+    $("titleTh").textContent = "ทดลองควอนตัม.com";
+    $("titleEn").textContent = "Try Quantum";
     $("sub").textContent = t("sub");
     $("honesty").textContent = t("honesty");
     $("promptLabel").textContent = t("promptLabel");
@@ -385,6 +397,19 @@
     return "<span class='proxy-pill " + cls + "' id='proxyPill'>" + label + "</span>";
   }
 
+  function moonshotKeyHowHtml() {
+    return (
+      "<details class='about-more origin-how'>" +
+        "<summary>" + t("moonshotKeyHow") + "</summary>" +
+        "<ol class='origin-how-steps'>" +
+          "<li>" + t("moonshotKeyHow1") + "</li>" +
+          "<li>" + t("moonshotKeyHow2") + "</li>" +
+          "<li>" + t("moonshotKeyHow3") + "</li>" +
+        "</ol>" +
+      "</details>"
+    );
+  }
+
   function originKeyHowHtml() {
     return (
       "<details class='about-more origin-how'>" +
@@ -405,12 +430,16 @@
     var base = state.baseUrl || DEFAULT_BASE;
     var model = state.model || DEFAULT_MODEL;
     var aiSel = base.indexOf("moonshot.cn") !== -1 ? "cn" : "ai";
+    var mkey = state.moonshotKey || "";
     var okey = state.originKey || "";
     var odev = state.originDevice || DEFAULT_DEVICE;
     $("settingsInner").innerHTML =
       "<h2>" + t("settings") + "</h2>" +
       "<p>" + proxyPillHtml() + "</p>" +
-      "<p class='settings-note'>" + t("keyOnProxy") + "</p>" +
+      "<p class='settings-note'>" + t("moonshotKeyHint") + "</p>" +
+      "<div class='settings-field'><label for='moonshotKey'>" + t("moonshotKey") + "</label>" +
+      "<input id='moonshotKey' type='password' value='" + escapeAttr(mkey) + "' autocomplete='off'></div>" +
+      moonshotKeyHowHtml() +
       "<div class='settings-field'><label for='apiBase'>" + t("apiBase") + "</label>" +
       "<select id='apiBase'>" +
         "<option value='https://api.moonshot.ai'" + (aiSel === "ai" ? " selected" : "") + ">https://api.moonshot.ai</option>" +
@@ -429,6 +458,14 @@
       "<div class='close-row'><button class='btn' type='button' id='btnCloseSettings'>" + t("close") + "</button></div>";
     $("btnCloseSettings").addEventListener("click", function () { closeSettings(); });
     $("btnOriginTest").addEventListener("click", testOriginKey);
+    $("moonshotKey").addEventListener("input", function () {
+      state.moonshotKey = $("moonshotKey").value || "";
+      localStorage.setItem(MOONSHOT_KEY, state.moonshotKey);
+    });
+    $("moonshotKey").addEventListener("change", function () {
+      state.moonshotKey = $("moonshotKey").value || "";
+      localStorage.setItem(MOONSHOT_KEY, state.moonshotKey);
+    });
     $("apiBase").addEventListener("change", function () {
       state.baseUrl = $("apiBase").value;
       localStorage.setItem(BASE_KEY, state.baseUrl);
@@ -1175,7 +1212,8 @@
     var body = {
       prompt: text,
       base_url: state.baseUrl || DEFAULT_BASE,
-      model: state.model || DEFAULT_MODEL
+      model: state.model || DEFAULT_MODEL,
+      moonshot_key: state.moonshotKey || ""
     };
     postPlan(body, 0).then(function (json) {
       stopWaitTicker();
