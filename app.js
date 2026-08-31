@@ -72,14 +72,16 @@
       aboutName: "Chonlatee Sukwiwattanaporn (ชลธี สุขวิวัฒนพร)",
       aboutTarget: "B.Eng. Robotics and AI, KMITL (target)",
       aboutMore: "อ่านเพิ่ม / more",
-      aboutLinks: "GitHub / domain — later",
+      aboutLinks: "เรียนควอนตัม.com",
       qeTitle: "Related project (credited, not absorbed)",
       qeName: "Quantum Experience / Quantum Physics Interactive",
       qeDevs: "Developers: ชลธี สุขวิวัฒนพร (Chonlatee Sukwiwattanaporn); ภวัต เอี่ยมสุภาพงษ์ (Pawat Iemsupapong)",
       qeAdvisor: "Advisor: อุกฤษ นาฏแก้ว (Aukrit Natkaew)",
       qeStatus: "Status: deployed prototype undergoing refinement. Team project. Chonlatee is not sole developer.",
-      qeDomain: "Planned domain เรียนควอนตัม.com — unverified this session.",
+      qeDomain: "เรียนควอนตัม.com",
       qeEval: "Approx evaluation 4.3/5 (from product brief; not re-measured here).",
+      sisterLink: "เรียนควอนตัม",
+      labLine: "Lab classroom at เรียนควอนตัม.com",
       originKey: "🔑 Origin API key",
       originDevice: "🧊 Device id",
       originTest: "✅ Test key",
@@ -183,14 +185,16 @@
       aboutName: "Chonlatee Sukwiwattanaporn (ชลธี สุขวิวัฒนพร)",
       aboutTarget: "B.Eng. Robotics and AI, KMITL (target)",
       aboutMore: "อ่านเพิ่ม / more",
-      aboutLinks: "GitHub / โดเมน — ไว้ทีหลัง",
+      aboutLinks: "เรียนควอนตัม.com",
       qeTitle: "โปรเจกต์ที่เกี่ยวข้อง (ให้เครดิต ไม่ดูดเข้ามา)",
       qeName: "Quantum Experience / Quantum Physics Interactive",
       qeDevs: "ผู้พัฒนา: ชลธี สุขวิวัฒนพร (Chonlatee Sukwiwattanaporn); ภวัต เอี่ยมสุภาพงษ์ (Pawat Iemsupapong)",
       qeAdvisor: "อาจารย์ที่ปรึกษา: อุกฤษ นาฏแก้ว (Aukrit Natkaew)",
       qeStatus: "สถานะ: ต้นแบบที่ใช้งานแล้ว กำลังปรับ โปรเจกต์ทีม ชลธีไม่ใช่ผู้พัฒนาคนเดียว",
-      qeDomain: "โดเมนที่วางไว้ เรียนควอนตัม.com — ยังไม่ตรวจในรอบนี้",
+      qeDomain: "เรียนควอนตัม.com",
       qeEval: "ประเมินโดยประมาณ 4.3/5 (จากบรีฟของงาน ไม่ได้วัดซ้ำที่นี่)",
+      sisterLink: "เรียนควอนตัม",
+      labLine: "ห้องแล็บสถานีอยู่ที่ เรียนควอนตัม.com",
       originKey: "🔑 Origin API key",
       originDevice: "🧊 Device id",
       originTest: "✅ Test key",
@@ -293,6 +297,8 @@
     $("titleEn").textContent = "Try Quantum";
     $("sub").textContent = t("sub");
     $("honesty").textContent = t("honesty");
+    $("sisterLink").textContent = t("sisterLink");
+    $("labLine").innerHTML = "<a href='https://เรียนควอนตัม.com' target='_blank' rel='noopener'>" + t("labLine") + "</a>";
     $("promptLabel").textContent = t("promptLabel");
     var promptEl = $("prompt");
     var savedPrompt = promptEl ? promptEl.value : "";
@@ -375,7 +381,7 @@
       "</div>" +
       "<p class='about-target'>" + t("aboutTarget") + "</p>" +
       "<p class='muted about-endorsement'>" + t("aboutEndorsement") + "</p>" +
-      "<p class='muted about-links'>" + t("aboutLinks") + "</p>" +
+      "<p class='muted about-links'><a href='https://เรียนควอนตัม.com' target='_blank' rel='noopener'>" + t("aboutLinks") + "</a></p>" +
       "<details class='about-more'>" +
         "<summary>" + t("aboutMore") + "</summary>" +
         "<div class='facts'><p>" + t("aboutSchool") + "</p>" +
@@ -384,7 +390,7 @@
         "<div class='credits'><h3>" + t("qeTitle") + "</h3>" +
         "<p><strong>" + t("qeName") + "</strong></p>" +
         "<ul><li>" + t("qeDevs") + "</li><li>" + t("qeAdvisor") + "</li>" +
-        "<li>" + t("qeStatus") + "</li><li>" + t("qeDomain") + "</li><li>" + t("qeEval") + "</li></ul></div>" +
+        "<li>" + t("qeStatus") + "</li><li><a href='https://เรียนควอนตัม.com' target='_blank' rel='noopener'>" + t("qeDomain") + "</a></li><li>" + t("qeEval") + "</li></ul></div>" +
       "</details>" +
       "<div class='close-row'><button class='btn' type='button' id='btnCloseAbout'>" + t("close") + "</button></div>";
     $("btnCloseAbout").addEventListener("click", function () { closeAbout(); });

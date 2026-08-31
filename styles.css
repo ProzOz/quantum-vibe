@@ -53,6 +53,16 @@ header.appbar {
   gap: 12px;
   margin-bottom: 12px;
 }
+.header-seals {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-seal {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
 .brand { flex: 1; min-width: 0; }
 .brand h1 {
   margin: 0;
@@ -60,6 +70,17 @@ header.appbar {
   letter-spacing: 0.02em;
 }
 .brand .sub { color: var(--muted); font-size: 0.85rem; }
+.sister-link {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0 8px;
+  border-bottom: 1px solid transparent;
+}
+.sister-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
 
 .lang, .about-btn {
   min-height: var(--tap);
@@ -78,7 +99,22 @@ header.appbar {
   padding: 10px 14px;
   border-radius: 12px;
   font-size: 0.92rem;
-  margin: 8px 0 16px;
+  margin: 8px 0 8px;
+}
+.lab-line {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0 0 16px;
+  padding: 0 2px;
+}
+.lab-line a {
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--muted);
+}
+.lab-line a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .panel {
@@ -237,6 +273,22 @@ pre {
   margin: 0 0 6px;
   font-size: 0.82rem;
   line-height: 1.4;
+}
+.about-links a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.about-links a:hover {
+  border-bottom-color: var(--accent);
+}
+.credits a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--line);
+}
+.credits a:hover {
+  border-bottom-color: var(--accent);
 }
 .about-more {
   margin: 10px 0 4px;
