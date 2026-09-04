@@ -45,6 +45,12 @@ html, body {
 }
 button, textarea, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
+button, a, .btn, .chip, .lang, .about-btn, summary {
+  touch-action: manipulation;
+}
+input, textarea, select {
+  font-size: 16px;
+}
 .wrap { max-width: 920px; margin: 0 auto; padding: 16px 16px 48px; }
 
 header.appbar {
