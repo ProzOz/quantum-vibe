@@ -650,13 +650,11 @@
   }
 
   function analogN(pack, sim) {
+    // HARD-BOUND to the circuit on screen — never infer n from leftover hardware counts.
     if (sim && sim.n) return sim.n;
-    var n = packN(pack);
-    var wk = wukongDisplay(pack);
-    var counts = (sim && sim.counts) || (wk && wk.counts) || {};
-    var keys = Object.keys(counts);
-    if (keys.length && keys[0]) return keys[0].length;
-    return n;
+    if (pack && pack.circuit && pack.circuit.n) return pack.circuit.n;
+    if (pack && pack.sim && pack.sim.n) return pack.sim.n;
+    return packN(pack);
   }
 
   function cleanQubitName(s) {
@@ -753,21 +751,14 @@
     var names = null;
     var onWord = "ติด";
     var offWord = "ดับ";
-    var kind = "sides";
+    var kind = screenCircuitKind(pack);
     var mixedPhrase = "ตื่นคนละแบบ";
     var stateLabels = null;
-    var packId = (pack && pack.id) || "";
     var titleLc = String(info.title || "").toLowerCase();
     var mapLine = String(info.mapping || "") + " " + String(info.line2 || "");
-    var isBell = packId === "bell"
-      || /bell|คู[่์]เบลล์|entangle|พันกัน/.test(titleLc)
-      || /bell|คู[่์]เบลล์|entangle|พันกัน/.test(info.blob);
-    var isGrover = packId === "grover"
-      || /grover|โกรเวอร์/.test(titleLc)
-      || /grover|โกรเวอร์/.test(info.blob);
-    var isDogCat = /หมา|แมว|dog|cat/.test(titleLc + " " + mapLine + " " + info.blob);
+    var isDogCat = kind === "pets" || /หมา|แมว|dog|cat/.test(titleLc + " " + mapLine);
     var bi;
-    if (isBell) {
+    if (kind === "bell") {
       names = [];
       names[0] = "ฝั่งซ้าย";
       if (n > 1) names[1] = "ฝั่งขวา";
@@ -776,7 +767,7 @@
       offWord = "เงียบ";
       kind = "bell";
       mixedPhrase = "ตื่นคนละใบ";
-    } else if (isGrover) {
+    } else if (kind === "grover") {
       names = [];
       for (bi = 0; bi < n; bi++) names.push(defaultQubitName(bi));
       onWord = "เจอ";
@@ -918,23 +909,32 @@
     return Math.round((c / tot) * 100);
   }
 
+  function sanitizeStoryLines(lines) {
+    return (lines || []).filter(function (line) {
+      if (!line) return false;
+      if (/ควิบิต|คิวบิต|qubit/i.test(line)) return false;
+      if (/job\s*id/i.test(line)) return false;
+      if (/\b(1024|256)\b/.test(line)) return false;
+      if (/%/.test(line)) return false;
+      if (/quantum advantage/i.test(line)) return false;
+      return true;
+    }).slice(0, 4);
+  }
+
   function humanCardLines(pack, sim, analog) {
-    analog = analog || {};
+    analog = analog || circuitAnalogy(pack, sim);
     var n = analog.n || packN(pack);
     var z = zerosBits(n);
     var o = onesBits(n);
     var lines = [];
-    var packId = (pack && pack.id) || "";
-    var kind = analog.kind || "";
-    var titleLc = String(analog.title || "").toLowerCase();
-    var isBell = kind === "bell" || packId === "bell";
-    var isGrover = kind === "grover" || packId === "grover";
-    var isDogCat = kind === "pets" || /หมา|แมว|dog|cat/.test(titleLc);
-    if (isBell) {
+    // HARD-BOUND to the circuit on screen — never leftover Bell/HW percents.
+    var kind = screenCircuitKind(pack);
+    var isDogCat = kind === "pets";
+    if (kind === "bell") {
       lines.push("คู่เบลล์: สองใบต้องออกหน้าเดียวกัน");
       lines.push("|" + z + "| เงียบด้วยกัน หรือ |" + o + "| ตื่นด้วยกัน คือคำตอบ");
       lines.push("|01| / |10| = ตื่นคนละใบ = ความสัมพันธ์พังหรือ noise");
-    } else if (isGrover) {
+    } else if (kind === "grover") {
       lines.push("โกรเวอร์ของเล่น: หาของที่ทำเครื่องหมาย");
       lines.push("เจอ = แท่งที่ทำเครื่อง (|" + o + "|)");
       lines.push("ยังไม่เจอ = แท่งอื่น");
@@ -946,6 +946,10 @@
         lines.push("แท่งที่ขึ้นคือหมาหรือแมว คือคำตอบ");
       }
       lines.push("แท่งอื่นคือพลาดหรือ noise");
+    } else if (kind === "super") {
+      lines.push("ซูเปอร์โพซิชันของเล่น");
+      lines.push("แท่งที่ขึ้นคือผลวัดได้");
+      lines.push("แท่งอื่นคือพลาดหรือ noise");
     } else if (n === 1 && analog.stateLabels) {
       var t1s = liveTitleWords(analog.title) || "วงจรนี้";
       lines.push(t1s);
@@ -953,30 +957,18 @@
       lines.push("แท่งอื่นคือพลาดหรือ noise");
     } else {
       var t1 = liveTitleWords(analog.title);
-      if (!t1) t1 = packId || "วงจรนี้";
+      if (!t1) t1 = (pack && pack.id) || "วงจรนี้";
       t1 = String(t1).replace(/q(?:ubit)?s?|ควิบิต|คิวบิต/gi, " ").replace(/\s+/g, " ").trim() || "วงจรนี้";
       lines.push(t1);
       if (n === 1) {
         var nm0 = (analog.names && analog.names[0]) || "";
         lines.push("|0| = " + nm0 + " " + analog.offWord + " · |1| = " + nm0 + " " + analog.onWord + " คือคำตอบ");
       } else {
-        lines.push("|" + z + "| ทั้งคู่ " + analog.offWord + " หรือ |" + o + "| ทั้งคู่ " + analog.onWord + " คือคำตอบ");
+        lines.push("แท่งที่ขึ้นคือผลวัดของวงจรนี้");
       }
       lines.push("แท่งอื่นคือพลาดหรือ noise");
     }
-    var wk = wukongDisplay(pack);
-    if (wk && hasAnyCounts(wk.counts)) {
-      lines.push("บน = โน้ตบุ๊กเงียบ / ล่าง = ตู้เย็นจริงมีเสียง");
-    }
-    return lines.filter(function (line) {
-      if (!line) return false;
-      if (/ควิบิต|คิวบิต|qubit/i.test(line)) return false;
-      if (/job\s*id/i.test(line)) return false;
-      if (/\b(1024|256)\b/.test(line)) return false;
-      if (/%/.test(line)) return false;
-      if (/quantum advantage/i.test(line)) return false;
-      return true;
-    }).slice(0, 4);
+    return sanitizeStoryLines(lines);
   }
 
   function renderHumanCard(pack, sim) {
@@ -1625,39 +1617,105 @@
     return "";
   }
 
+  function demoFingerprint(id) {
+    try {
+      var d = QVDemos.DEMOS[id];
+      if (!d || !d.circuit) return "";
+      return String(QVSim.toQasm(d.circuit) || "").replace(/\r\n/g, "\n").trim();
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function bellDemoFingerprint() {
+    return demoFingerprint("bell");
+  }
+
+  function looksLikeGroverCircuit(gates, n) {
+    if (n !== 2 || !gates || !gates.length) return false;
+    var h = 0, cz = 0, i;
+    for (i = 0; i < gates.length; i++) {
+      if (gates[i].type === "h") h++;
+      if (gates[i].type === "cz") cz++;
+    }
+    return cz >= 2 && h >= 4;
+  }
+
+  function looksLikeBellCircuit(gates, n) {
+    if (n !== 2 || !gates || gates.length < 2) return false;
+    if (looksLikeGroverCircuit(gates, n)) return false;
+    var hasH0 = false, hasCX = false, extra = 0, i;
+    for (i = 0; i < gates.length; i++) {
+      var g = gates[i];
+      if (g.type === "h" && g.q === 0) hasH0 = true;
+      else if (g.type === "cx" && g.a === 0 && g.b === 1) hasCX = true;
+      else if (g.type === "barrier") continue;
+      else extra++;
+    }
+    return hasH0 && hasCX && extra === 0;
+  }
+
+  function screenCircuitKind(pack) {
+    if (!pack) return "sides";
+    var id = pack.id || (pack.demo && pack.demo.id) || "";
+    if (id === "bell" || id === "grover" || id === "super" || id === "teach" || id === "traffic" || id === "dengue") {
+      return id;
+    }
+    var fp = circuitFingerprint(pack);
+    if (fp) {
+      var names = ["bell", "grover", "super", "teach", "traffic", "dengue"];
+      var i;
+      for (i = 0; i < names.length; i++) {
+        var dfp = demoFingerprint(names[i]);
+        if (dfp && fp === dfp) return names[i];
+        try {
+          var d = QVDemos.DEMOS[names[i]];
+          if (d && d.circuit) {
+            var gfp = String(d.circuit.n || 0) + "|" + JSON.stringify(d.circuit.gates || []);
+            if (fp === gfp) return names[i];
+          }
+        } catch (e) {}
+      }
+    }
+    var gates = (pack.circuit && pack.circuit.gates) || [];
+    var n = pack.circuit && pack.circuit.n;
+    if (looksLikeGroverCircuit(gates, n)) return "grover";
+    if (looksLikeBellCircuit(gates, n)) return "bell";
+    var title = "";
+    try { title = resultTitle(pack) || ""; } catch (e2) { title = ""; }
+    var prompt = pack.prompt || "";
+    var mapping = (pack.plan && pack.plan.mapping) || "";
+    var blob = (title + " " + prompt + " " + mapping).toLowerCase();
+    if (/grover|โกรเวอร์/.test(blob)) return "grover";
+    if (/หมา|แมว|dog|cat/.test(blob)) return "pets";
+    if (/^bell$|\bbell\b|คู[่์]เบลล์|entangle|พันกัน/.test(blob) && !/grover|โกรเวอร์/.test(blob)) return "bell";
+    return "sides";
+  }
+
   function isKnownBellJobId(jobId) {
     return String(jobId || "") === KNOWN_BELL_JOB_ID;
   }
 
   function packLooksBell(pack) {
-    if (!pack) return false;
-    if (pack.id === "bell") return true;
-    if (pack.demo && pack.demo.id === "bell") return true;
-    var title = "";
-    try { title = resultTitle(pack) || ""; } catch (e) { title = ""; }
-    var titleLc = String(title).toLowerCase();
-    if (/bell|คู[่์]เบลล์/i.test(titleLc)) return true;
-    var mapping = (pack.plan && pack.plan.mapping) || "";
-    var extra = "";
-    if (pack.demo) {
-      extra += " " + ((pack.demo.title && (pack.demo.title.th || pack.demo.title.en)) || "");
-      extra += " " + ((pack.demo.explain && (pack.demo.explain.th || pack.demo.explain.en)) || "");
-      extra += " " + ((pack.demo.mapNote && (pack.demo.mapNote.th || pack.demo.mapNote.en)) || "");
-    }
-    var blob = (title + " " + mapping + " " + extra).toLowerCase();
-    if (/bell|คู[่์]เบลล์|entangle|พันกัน/.test(blob)) return true;
-    return false;
+    return screenCircuitKind(pack) === "bell";
   }
 
   function knownBellJobMatchesPack(pack, rec) {
     var jobId = (pack && pack.wukongJobId) || (rec && rec.jobId) || "";
-    return isKnownBellJobId(jobId) && packLooksBell(pack);
+    return isKnownBellJobId(jobId) && screenCircuitKind(pack) === "bell";
   }
 
   function jobCircuitFingerprint(pack, rec) {
     if (pack && pack.wukongCircuitFingerprint) return String(pack.wukongCircuitFingerprint);
     if (rec && rec.circuitFingerprint) return String(rec.circuitFingerprint);
     return "";
+  }
+
+  function producerFingerprint(pack, rec) {
+    var jobId = (pack && pack.wukongJobId) || (rec && rec.jobId) || "";
+    var fp = jobCircuitFingerprint(pack, rec);
+    if (isKnownBellJobId(jobId)) return bellDemoFingerprint() || fp;
+    return fp;
   }
 
   function hasWukongPayload(pack, rec) {
@@ -1671,8 +1729,13 @@
   function wukongMatchesCircuit(pack, rec) {
     rec = rec || loadWukongJob();
     var jobId = (pack && pack.wukongJobId) || (rec && rec.jobId) || "";
-    if (isKnownBellJobId(jobId)) return packLooksBell(pack);
     var cur = circuitFingerprint(pack);
+    if (isKnownBellJobId(jobId)) {
+      if (screenCircuitKind(pack) !== "bell") return false;
+      var bellFp = bellDemoFingerprint();
+      if (cur && bellFp) return cur === bellFp;
+      return false;
+    }
     if (!cur) return false;
     var jobFp = jobCircuitFingerprint(pack, rec);
     if (!jobFp) return false;
@@ -1683,21 +1746,31 @@
     if (!pack) return false;
     var rec = loadWukongJob();
     var jobId = pack.wukongJobId || (rec && rec.jobId) || "";
-    if (isKnownBellJobId(jobId) && packLooksBell(pack)) return false;
-    if (isKnownBellJobId(jobId) && !packLooksBell(pack)) return true;
+    if (!jobId && !pack.wukongMismatch) return false;
+    if (wukongMatchesCircuit(pack, rec)) return false;
     if (pack.wukongMismatch) return true;
+    if (isKnownBellJobId(jobId) && screenCircuitKind(pack) !== "bell") return true;
     var cur = circuitFingerprint(pack);
-    var jobFp = jobCircuitFingerprint(pack, rec);
+    var jobFp = producerFingerprint(pack, rec);
     if (cur && jobFp && cur !== jobFp) return true;
-    if (hasWukongPayload(pack, rec) && !jobFp) return true;
-    if (hasWukongPayload(pack, rec) && jobFp && cur && jobFp !== cur) return true;
+    if (hasWukongPayload(pack, rec) && !wukongMatchesCircuit(pack, rec)) return true;
     return false;
   }
 
   function wukongDisplay(pack) {
     if (!pack || !pack.wukong || !pack.wukong.ok || !hasAnyCounts(pack.wukong.counts)) return null;
     if (!wukongMatchesCircuit(pack)) return null;
+    if (isWukongMismatch(pack)) return null;
     return pack.wukong;
+  }
+
+  function wukongPanelMode(pack) {
+    if (wukongDisplay(pack)) return "bars";
+    if (isWukongMismatch(pack)) return "mismatch";
+    if (pack && (pack.wukongWait || pack.wukongStale)) return "wait";
+    if (pack && pack.wukongParseFail) return "fail";
+    if (pack && pack.wukongError) return "error";
+    return "idle";
   }
 
   function persistWukongJob(pack) {
@@ -1717,8 +1790,14 @@
     var sameJob = !!(prev && String(prev.jobId) === jobId);
     var producerFp = "";
     if (sameJob && prev.circuitFingerprint) producerFp = String(prev.circuitFingerprint);
+    if (!producerFp && isKnownBellJobId(jobId)) producerFp = bellDemoFingerprint();
+    // Adopt on-screen fingerprint only when this pack produced the job (same circuit).
     if (!pack.wukongMismatch && pack.wukongCircuitFingerprint && curFp && pack.wukongCircuitFingerprint === curFp) {
-      producerFp = String(pack.wukongCircuitFingerprint);
+      if (!producerFp || producerFp === curFp) producerFp = String(pack.wukongCircuitFingerprint);
+    }
+    if (isKnownBellJobId(jobId)) {
+      var bellFp = bellDemoFingerprint();
+      if (bellFp) producerFp = bellFp;
     }
     var rec = {
       jobId: jobId,
@@ -1737,10 +1816,12 @@
     }
     if (pack.wukongDevice) rec.device = pack.wukongDevice;
     else if (pack.wukong && pack.wukong.device) rec.device = pack.wukong.device;
-    var screenMismatch = !!pack.wukongMismatch || (producerFp && curFp && producerFp !== curFp && !knownBellJobMatchesPack(pack, prev));
+    var screenMismatch = !!pack.wukongMismatch || !!(producerFp && curFp && producerFp !== curFp);
+    if (isKnownBellJobId(jobId) && screenCircuitKind(pack) !== "bell") screenMismatch = true;
     if (sameJob) {
       if (screenMismatch) {
         rec.circuitFingerprint = prev.circuitFingerprint || producerFp;
+        if (isKnownBellJobId(jobId)) rec.circuitFingerprint = bellDemoFingerprint() || rec.circuitFingerprint;
         if (prev.title) rec.title = prev.title;
         if (prev.n) rec.n = prev.n;
         if (prev.shots) rec.shots = prev.shots;
@@ -1751,7 +1832,7 @@
       if (!rec.title && prev.title) rec.title = prev.title;
       if (rec.rawResult == null && prev.rawResult != null) rec.rawResult = prev.rawResult;
     }
-    if (!pack.wukongMismatch && pack.wukong && pack.wukong.ok && pack.wukong.counts && wukongMatchesCircuit(pack, rec)) {
+    if (!pack.wukongMismatch && pack.wukong && pack.wukong.ok && pack.wukong.counts && !screenMismatch && wukongMatchesCircuit(pack, rec)) {
       rec.counts = pack.wukong.counts;
       rec.percents = pack.wukong.percents || null;
     } else if (sameJob && prev.counts) {
@@ -1797,9 +1878,13 @@
     pack.wukong = null;
     pack.wukongMismatch = false;
     if (rec.circuitFingerprint) pack.wukongCircuitFingerprint = rec.circuitFingerprint;
+    else if (isKnownBellJobId(rec.jobId)) pack.wukongCircuitFingerprint = bellDemoFingerprint();
     var match = wukongMatchesCircuit(pack, rec);
     if (!match) {
-      if (rec.counts || rec.circuitFingerprint || rec.rawResult != null) pack.wukongMismatch = true;
+      if (rec.counts || rec.circuitFingerprint || rec.rawResult != null || isKnownBellJobId(rec.jobId)) {
+        pack.wukongMismatch = true;
+      }
+      pack.wukong = null;
       return pack;
     }
     var n = rec.n || packN(pack);
@@ -2004,7 +2089,7 @@
     pack.wukongParseFail = false;
     var rec = loadWukongJob();
     var recForJob = rec && rec.jobId && String(rec.jobId) === String(pack.wukongJobId) ? rec : null;
-    var jobFp = jobCircuitFingerprint(pack, recForJob);
+    var jobFp = producerFingerprint(pack, recForJob);
     var match = wukongMatchesCircuit(pack, recForJob);
     if (!match) {
       pack.wukongMismatch = true;
@@ -2095,7 +2180,8 @@
     wkBox.style.marginTop = "12px";
     wkBox.id = "wukongBox";
     var wkShow = wukongDisplay(pack);
-    if (wkShow) {
+    var mode = wukongPanelMode(pack);
+    if (mode === "bars" && wkShow) {
       wkBox.classList.add("wukong-done");
       var h = document.createElement("h3");
       fillHumanJargon(h, t("wukongDoneTitle"), t("wukongTitleJargon"));
@@ -2125,7 +2211,7 @@
       wkBox.appendChild(meta);
       appendJobIdRow(wkBox, pack.wukongJobId || wkShow.job_id || "");
       appendWukongFollowup(wkBox, pack);
-    } else if (isWukongMismatch(pack)) {
+    } else if (mode === "mismatch") {
       var mh = document.createElement("h3");
       fillHumanJargon(mh, t("wukongWaitTitle"), t("wukongTitleJargon"));
       wkBox.appendChild(mh);
@@ -2527,14 +2613,19 @@
     if (saved && saved.jobId === pack.wukongJobId && saved.circuitFingerprint && !pack.wukongCircuitFingerprint) {
       pack.wukongCircuitFingerprint = saved.circuitFingerprint;
     }
-    if (!wukongMatchesCircuit(pack, saved) && (hasWukongPayload(pack, saved) || isKnownBellJobId(pack.wukongJobId))) {
-      pack.wukongMismatch = true;
-      pack.wukong = null;
-      var refuseFp = jobCircuitFingerprint(pack, saved);
-      if (refuseFp) pack.wukongCircuitFingerprint = refuseFp;
-      persistWukongJob(pack);
-      renderResult(pack);
-      return;
+    if (isKnownBellJobId(pack.wukongJobId) && !pack.wukongCircuitFingerprint) {
+      pack.wukongCircuitFingerprint = bellDemoFingerprint();
+    }
+    if (!wukongMatchesCircuit(pack, saved)) {
+      if (hasWukongPayload(pack, saved) || isKnownBellJobId(pack.wukongJobId) || (saved && String(saved.jobId) === String(pack.wukongJobId))) {
+        pack.wukongMismatch = true;
+        pack.wukong = null;
+        var refuseFp = producerFingerprint(pack, saved);
+        if (refuseFp) pack.wukongCircuitFingerprint = refuseFp;
+        persistWukongJob(pack);
+        renderResult(pack);
+        return;
+      }
     }
     if (pack.wukongRaw != null && pack.wukongRaw !== "") {
       var parsedLocal = parseOriginResult(pack.wukongRaw, n, shots);
@@ -2577,6 +2668,14 @@
   function pollWukongOnce(fromButton) {
     var pack = state.last;
     if (!pack || !pack.wukongJobId) return;
+    var savedPoll = loadWukongJob();
+    if (!wukongMatchesCircuit(pack, savedPoll) && (hasWukongPayload(pack, savedPoll) || isKnownBellJobId(pack.wukongJobId))) {
+      pack.wukongMismatch = true;
+      pack.wukong = null;
+      persistWukongJob(pack);
+      if (fromButton) renderResult(pack);
+      return;
+    }
     if (fromButton) {
       var why = originExplain();
       if (why) {
@@ -2819,5 +2918,27 @@
     if (location.hash === "#settings") openSettings();
   });
 
-  window.QVApp = { runDemo: runDemo, mapPrompt: QVDemos.mapPrompt, runPrompt: runPrompt, parseOriginResult: parseOriginResult, persistWukongJob: persistWukongJob, loadWukongJob: loadWukongJob };
+  window.QVApp = {
+    runDemo: runDemo,
+    mapPrompt: QVDemos.mapPrompt,
+    runPrompt: runPrompt,
+    parseOriginResult: parseOriginResult,
+    persistWukongJob: persistWukongJob,
+    loadWukongJob: loadWukongJob,
+    circuitFingerprint: circuitFingerprint,
+    screenCircuitKind: screenCircuitKind,
+    humanCardLines: humanCardLines,
+    circuitAnalogy: circuitAnalogy,
+    wukongMatchesCircuit: wukongMatchesCircuit,
+    isWukongMismatch: isWukongMismatch,
+    wukongDisplay: wukongDisplay,
+    wukongPanelMode: wukongPanelMode,
+    applySavedJobToPack: applySavedJobToPack,
+    applyWukongParsed: applyWukongParsed,
+    onCheckWukongAgain: onCheckWukongAgain,
+    KNOWN_BELL_JOB_ID: KNOWN_BELL_JOB_ID,
+    WUKONG_JOB_KEY: WUKONG_JOB_KEY,
+    bellDemoFingerprint: bellDemoFingerprint,
+    sanitizeStoryLines: sanitizeStoryLines
+  };
 })();
