@@ -2507,9 +2507,12 @@
     
     for (var k = 0; k < qubitData.length; k++) {
       var qd = qubitData[k];
-      var qg = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      qg.setAttribute("class", "qubit-dancer " + qd.cls);
-      qg.setAttribute("transform", "translate(40, " + qd.y + ")");
+      
+      var outerG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      outerG.setAttribute("transform", "translate(40, " + qd.y + ")");
+      
+      var innerG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      innerG.setAttribute("class", "qubit-dancer " + qd.cls);
       
       var body = document.createElementNS("http://www.w3.org/2000/svg", "circle");
       body.setAttribute("cx", "0");
@@ -2518,7 +2521,7 @@
       body.setAttribute("fill", qd.color);
       body.setAttribute("stroke", "#fff");
       body.setAttribute("stroke-width", "2");
-      qg.appendChild(body);
+      innerG.appendChild(body);
       
       var face = document.createElementNS("http://www.w3.org/2000/svg", "text");
       face.setAttribute("x", "0");
@@ -2529,9 +2532,10 @@
       face.setAttribute("font-size", "10");
       face.setAttribute("font-weight", "700");
       face.textContent = qd.face;
-      qg.appendChild(face);
+      innerG.appendChild(face);
       
-      svg.appendChild(qg);
+      outerG.appendChild(innerG);
+      svg.appendChild(outerG);
     }
     
     var fridge = document.createElementNS("http://www.w3.org/2000/svg", "text");
