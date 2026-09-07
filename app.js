@@ -85,18 +85,16 @@
       qeEval: "Approx evaluation 4.3/5 (from product brief; not re-measured here).",
       sisterLink: "เรียนควอนตัม",
       labLine: "Lab classroom at เรียนควอนตัม.com",
-      originBlockTitle: "🔥 Origin / Wukong — ชิปตู้เย็นจริง · a real fridge chip (free tier)",
-      originWhat: "Origin คือชิปควอนตัมในตู้เย็นจริงที่จีน (Wukong 180) ไม่ใช่ซิมในเบราว์เซอร์นี้ · a real fridge chip, not the browser sim.",
-      originFree: "สมัครฟรี + ขอ API key ฟรีเทียร์ได้ พอสำหรับเดโมนี้ ไม่ต้องรูดบัตร · signup + key are free enough for this demo.",
-      originHowTitle: "ทำยังไง — 5 ขั้น แป๊บเดียว / 5 quick steps",
-      originHow1: "กดปุ่มด้านล่าง เปิดคอนโซล Origin · tap below to open the console",
-      originHow2: "สมัครหรือล็อกอิน ฟรี · sign up / log in — it's free",
-      originHow3: "เมนูซ้าย → Account / 账户 → API Key",
-      originHow4: "ก็อปปี้คีย์ แล้ววางในช่องด้านล่างนี้ ↓ · paste it in the box below",
-      originHow5: "กด Test key ให้ขึ้น ✅ แล้วไปยิงชิปได้ · then you can fire the chip",
-      originPasteHere: "วาง Origin API key ตรงนี้ · paste the key here",
-      originKeyHint: "คีย์อยู่แค่ในเบราว์เซอร์เธอ ไม่ได้เก็บบนเซิร์ฟเวอร์ ไม่ถูก log · browser only, never logged.",
-      originConsoleBtn: "เปิดคอนโซล Origin — สมัครฟรี · open console, free signup",
+      originBlockTitle: "Origin / Wukong — ชิปตู้เย็นจริง",
+      originWhat: "ชิปควอนตัมจริงในตู้เย็นที่จีน (Wukong 180) ไม่ใช่ซิมในเบราว์เซอร์",
+      originFree: "สมัครฟรี + API key ฟรีเทียร์ พอสำหรับเดโมนี้ ไม่ต้องรูดบัตร",
+      originHowToggle: "วิธีสมัคร",
+      originHow1: "เปิดคอนโซล Origin (กดปุ่มด้านล่าง)",
+      originHow2: "สมัครหรือล็อกอิน (ฟรี)",
+      originHow3: "เมนูซ้าย → Account / 账户 → API Key → คัดลอก",
+      originPasteHere: "วาง API key ตรงนี้",
+      originKeyHint: "คีย์อยู่ในเบราว์เซอร์เธออย่างเดียว ไม่ถูกเก็บบนเซิร์ฟเวอร์",
+      originConsoleBtn: "เปิดคอนโซล (ฟรี)",
       originDeviceHint: "ชิปเดโม: WK_C180 (ไม่ต้องเปลี่ยน / leave it)",
       originDevice: "Device id",
       originToyNote: "ยังเป็นของเล่นสอน ชิปจริงช้า มี noise — ไม่ได้ชนะคอมบ้าน. Still a teaching toy — not quantum advantage.",
@@ -206,18 +204,16 @@
       qeEval: "ประเมินโดยประมาณ 4.3/5 (จากบรีฟของงาน ไม่ได้วัดซ้ำที่นี่)",
       sisterLink: "เรียนควอนตัม",
       labLine: "ห้องแล็บสถานีอยู่ที่ เรียนควอนตัม.com",
-      originBlockTitle: "🔥 Origin / Wukong — ชิปตู้เย็นจริง (ฟรีเทียร์)",
-      originWhat: "Origin คือชิปควอนตัมในตู้เย็นจริงที่จีน (Wukong 180) ไม่ใช่ซิมในเบราว์เซอร์นี้",
-      originFree: "สมัครฟรี + ขอ API key ฟรีเทียร์ได้ พอสำหรับเดโมนี้ ไม่ต้องรูดบัตร · free enough for this demo",
-      originHowTitle: "ทำยังไง — 5 ขั้น แป๊บเดียว",
-      originHow1: "กดปุ่มด้านล่าง เปิดคอนโซล Origin",
-      originHow2: "สมัครหรือล็อกอิน ฟรี",
-      originHow3: "เมนูซ้าย → Account / 账户 → API Key",
-      originHow4: "ก็อปปี้คีย์ แล้ววางในช่องด้านล่างนี้ ↓",
-      originHow5: "กด Test key ให้ขึ้น ✅ แล้วไปยิงชิปได้",
-      originPasteHere: "วาง Origin API key ตรงนี้",
-      originKeyHint: "คีย์อยู่แค่ในเบราว์เซอร์เธอ ไม่ได้เก็บบนเซิร์ฟเวอร์ ไม่ถูก log",
-      originConsoleBtn: "เปิดคอนโซล Origin — สมัครฟรี",
+      originBlockTitle: "Origin / Wukong — ชิปตู้เย็นจริง",
+      originWhat: "ชิปควอนตัมจริงในตู้เย็นที่จีน (Wukong 180) ไม่ใช่ซิมในเบราว์เซอร์",
+      originFree: "สมัครฟรี + API key ฟรีเทียร์ พอสำหรับเดโมนี้ ไม่ต้องรูดบัตร",
+      originHowToggle: "วิธีสมัคร",
+      originHow1: "เปิดคอนโซล Origin (กดปุ่มด้านล่าง)",
+      originHow2: "สมัครหรือล็อกอิน (ฟรี)",
+      originHow3: "เมนูซ้าย → Account / 账户 → API Key → คัดลอก",
+      originPasteHere: "วาง API key ตรงนี้",
+      originKeyHint: "คีย์อยู่ในเบราว์เซอร์เธออย่างเดียว ไม่ถูกเก็บบนเซิร์ฟเวอร์",
+      originConsoleBtn: "เปิดคอนโซล (ฟรี)",
       originDeviceHint: "ชิปเดโม: WK_C180 (ไม่ต้องเปลี่ยน)",
       originDevice: "Device id",
       originToyNote: "ยังเป็นของเล่นสอน ชิปจริงช้า มี noise — ไม่ได้ชนะคอมบ้าน ไม่ใช่ quantum advantage",
@@ -437,18 +433,18 @@
     var odev = state.originDevice || DEFAULT_DEVICE;
     return (
       "<section class='origin-install' aria-labelledby='originInstallTitle'>" +
-        "<p class='origin-free-pill'>ฟรี · free tier</p>" +
+        "<p class='origin-free-pill'>ฟรี</p>" +
         "<h3 id='originInstallTitle'>" + t("originBlockTitle") + "</h3>" +
         "<p class='origin-what'>" + t("originWhat") + "</p>" +
         "<p class='origin-free'>" + t("originFree") + "</p>" +
-        "<p class='origin-how-title'>" + t("originHowTitle") + "</p>" +
-        "<ol class='origin-how-steps'>" +
-          "<li>" + t("originHow1") + "</li>" +
-          "<li>" + t("originHow2") + "</li>" +
-          "<li>" + t("originHow3") + "</li>" +
-          "<li>" + t("originHow4") + "</li>" +
-          "<li>" + t("originHow5") + "</li>" +
-        "</ol>" +
+        "<details class='origin-how-details'>" +
+          "<summary>" + t("originHowToggle") + "</summary>" +
+          "<ol class='origin-how-steps'>" +
+            "<li>" + t("originHow1") + "</li>" +
+            "<li>" + t("originHow2") + "</li>" +
+            "<li>" + t("originHow3") + "</li>" +
+          "</ol>" +
+        "</details>" +
         "<a class='origin-console-btn' href='https://console.originqc.com.cn/en/' target='_blank' rel='noopener noreferrer'>" + t("originConsoleBtn") + "</a>" +
         "<div class='settings-field'><label class='origin-paste-label' for='originKey'>" + t("originPasteHere") + "</label>" +
         "<input id='originKey' type='password' value='" + escapeAttr(okey) + "' autocomplete='off'></div>" +

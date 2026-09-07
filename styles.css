@@ -430,15 +430,15 @@ pre {
 .origin-install {
   margin: 8px 0 12px;
   padding: 14px 14px 16px;
-  border: 1px solid rgba(255, 196, 107, 0.4);
-  border-radius: 16px;
-  background: rgba(255, 214, 102, 0.08);
+  border: 1px solid rgba(255, 196, 107, 0.3);
+  border-radius: 14px;
+  background: rgba(255, 214, 102, 0.05);
 }
 .origin-install h3 {
   text-transform: none;
   letter-spacing: 0;
   color: var(--text);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
   margin: 0 0 8px;
   line-height: 1.35;
@@ -446,35 +446,51 @@ pre {
 .origin-free-pill {
   display: inline-block;
   margin: 0 0 8px;
-  padding: 4px 10px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   color: #1d3b22;
   background: #b8f0c2;
-  border: 1px solid rgba(125, 255, 179, 0.5);
+  border: 1px solid rgba(125, 255, 179, 0.4);
 }
 .origin-what, .origin-free {
   margin: 0 0 8px;
-  font-size: 0.95rem;
-  line-height: 1.45;
+  font-size: 0.9rem;
+  line-height: 1.4;
   color: var(--text);
 }
-.origin-free { font-weight: 600; color: var(--warn); }
-.origin-how-title {
-  margin: 10px 0 6px;
-  font-weight: 600;
+.origin-free { 
+  font-weight: 500; 
+  color: var(--text);
+  font-size: 0.88rem;
+}
+.origin-how-details {
+  margin: 8px 0 10px;
+  padding: 0;
+  border: none;
+}
+.origin-how-details summary {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 0;
+  list-style-position: outside;
+}
+.origin-how-details summary:hover {
   color: var(--text);
 }
 .origin-how-steps {
-  margin: 0 0 12px;
-  padding: 0 0 0 1.25em;
+  margin: 8px 0 0;
+  padding: 0 0 0 1.2em;
 }
 .origin-how-steps li {
-  margin: 0 0 8px;
-  line-height: 1.45;
-  font-size: 0.95rem;
+  margin: 0 0 6px;
+  line-height: 1.4;
+  font-size: 0.88rem;
+  color: var(--text);
 }
 .origin-how-steps li:last-child { margin-bottom: 0; }
 .origin-console-btn {
@@ -485,11 +501,12 @@ pre {
   min-height: var(--tap);
   margin: 4px 0 14px;
   padding: 0 16px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  background: linear-gradient(135deg, #1b6f74, #4b3d86);
+  border-radius: 10px;
+  border: 1px solid rgba(27, 111, 116, 0.3);
+  background: linear-gradient(135deg, #1e7479, #3a5f88);
   color: white;
   font-weight: 600;
+  font-size: 0.95rem;
   text-decoration: none;
   text-align: center;
 }
@@ -499,8 +516,12 @@ pre {
 }
 .origin-paste-label {
   color: var(--text) !important;
-  font-size: 0.95rem !important;
+  font-size: 0.9rem !important;
   font-weight: 600;
+}
+#originKey {
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
 }
 .origin-test-btn {
   width: 100%;
@@ -603,6 +624,50 @@ pre {
   text-transform: none;
   letter-spacing: 0;
   font-weight: 600;
+  position: relative;
+}
+
+/* Real QPU waiting animation - subtle fridge-chip pulse */
+@keyframes qpu-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 18px rgba(92, 225, 230, 0.15), 0 0 32px rgba(92, 225, 230, 0.08);
+    border-color: rgba(92, 225, 230, 0.35);
+  }
+  50% { 
+    box-shadow: 0 0 26px rgba(92, 225, 230, 0.28), 0 0 48px rgba(92, 225, 230, 0.14);
+    border-color: rgba(92, 225, 230, 0.55);
+  }
+}
+
+@keyframes qpu-shimmer {
+  0%, 100% { opacity: 0.4; transform: translateY(0); }
+  50% { opacity: 0.7; transform: translateY(-2px); }
+}
+
+#wukongBox.wukong-wait {
+  border: 2px solid rgba(92, 225, 230, 0.35);
+  background: linear-gradient(180deg, rgba(92, 225, 230, 0.08), rgba(14, 21, 40, 0.92));
+  box-shadow: 0 0 18px rgba(92, 225, 230, 0.15);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #wukongBox.wukong-wait {
+    animation: qpu-pulse 3s ease-in-out infinite;
+  }
+  
+  .wukong-wait h3::before {
+    content: "❄️";
+    position: absolute;
+    left: -1.5em;
+    animation: qpu-shimmer 2s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #wukongBox.wukong-wait {
+    border: 2px solid rgba(92, 225, 230, 0.45);
+    box-shadow: 0 0 24px rgba(92, 225, 230, 0.2);
+  }
 }
 .wukong-job {
   display: flex;
@@ -626,6 +691,18 @@ pre {
   font-size: 1.02rem;
   margin: 8px 0;
   color: var(--text);
+  position: relative;
+  padding-left: 1.2em;
+}
+
+/* Subtle progress dots for QPU pipeline */
+@media (prefers-reduced-motion: no-preference) {
+  .wukong-wait .wukong-steps::before {
+    content: "⏳";
+    position: absolute;
+    left: 0;
+    animation: qpu-shimmer 2s ease-in-out infinite;
+  }
 }
 .wukong-hint {
   color: var(--warn);
