@@ -430,15 +430,15 @@ pre {
 .origin-install {
   margin: 8px 0 12px;
   padding: 14px 14px 16px;
-  border: 1px solid rgba(255, 196, 107, 0.4);
-  border-radius: 16px;
-  background: rgba(255, 214, 102, 0.08);
+  border: 1px solid rgba(255, 196, 107, 0.3);
+  border-radius: 14px;
+  background: rgba(255, 214, 102, 0.05);
 }
 .origin-install h3 {
   text-transform: none;
   letter-spacing: 0;
   color: var(--text);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
   margin: 0 0 8px;
   line-height: 1.35;
@@ -446,35 +446,51 @@ pre {
 .origin-free-pill {
   display: inline-block;
   margin: 0 0 8px;
-  padding: 4px 10px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   color: #1d3b22;
   background: #b8f0c2;
-  border: 1px solid rgba(125, 255, 179, 0.5);
+  border: 1px solid rgba(125, 255, 179, 0.4);
 }
 .origin-what, .origin-free {
   margin: 0 0 8px;
-  font-size: 0.95rem;
-  line-height: 1.45;
+  font-size: 0.9rem;
+  line-height: 1.4;
   color: var(--text);
 }
-.origin-free { font-weight: 600; color: var(--warn); }
-.origin-how-title {
-  margin: 10px 0 6px;
-  font-weight: 600;
+.origin-free { 
+  font-weight: 500; 
+  color: var(--text);
+  font-size: 0.88rem;
+}
+.origin-how-details {
+  margin: 8px 0 10px;
+  padding: 0;
+  border: none;
+}
+.origin-how-details summary {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 0;
+  list-style-position: outside;
+}
+.origin-how-details summary:hover {
   color: var(--text);
 }
 .origin-how-steps {
-  margin: 0 0 12px;
-  padding: 0 0 0 1.25em;
+  margin: 8px 0 0;
+  padding: 0 0 0 1.2em;
 }
 .origin-how-steps li {
-  margin: 0 0 8px;
-  line-height: 1.45;
-  font-size: 0.95rem;
+  margin: 0 0 6px;
+  line-height: 1.4;
+  font-size: 0.88rem;
+  color: var(--text);
 }
 .origin-how-steps li:last-child { margin-bottom: 0; }
 .origin-console-btn {
@@ -485,11 +501,12 @@ pre {
   min-height: var(--tap);
   margin: 4px 0 14px;
   padding: 0 16px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  background: linear-gradient(135deg, #1b6f74, #4b3d86);
+  border-radius: 10px;
+  border: 1px solid rgba(27, 111, 116, 0.3);
+  background: linear-gradient(135deg, #1e7479, #3a5f88);
   color: white;
   font-weight: 600;
+  font-size: 0.95rem;
   text-decoration: none;
   text-align: center;
 }
@@ -499,8 +516,12 @@ pre {
 }
 .origin-paste-label {
   color: var(--text) !important;
-  font-size: 0.95rem !important;
+  font-size: 0.9rem !important;
   font-weight: 600;
+}
+#originKey {
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
 }
 .origin-test-btn {
   width: 100%;
