@@ -422,31 +422,54 @@ pre {
 }
 .settings-note { color: var(--muted); font-size: 0.88rem; margin: 0 0 14px; }
 
-.origin-how {
-  margin: 0 0 16px;
-  padding: 10px 12px 12px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
+.kimi-settings { margin: 0 0 8px; }
+.moonshot-how, .settings-advanced, .origin-device-more {
+  margin: 0 0 12px;
+}
+
+.origin-install {
+  margin: 8px 0 12px;
+  padding: 14px 14px 16px;
+  border: 1px solid rgba(255, 196, 107, 0.4);
+  border-radius: 16px;
   background: rgba(255, 214, 102, 0.08);
 }
-.origin-how summary {
+.origin-install h3 {
+  text-transform: none;
+  letter-spacing: 0;
   color: var(--text);
-  font-size: 1rem;
-}
-.origin-how-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 4px 0 10px;
-  min-height: var(--tap);
+  font-size: 1.05rem;
   font-weight: 600;
-  color: var(--accent);
-  text-decoration: none;
+  margin: 0 0 8px;
+  line-height: 1.35;
 }
-.origin-how-link:hover { text-decoration: underline; }
+.origin-free-pill {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #1d3b22;
+  background: #b8f0c2;
+  border: 1px solid rgba(125, 255, 179, 0.5);
+}
+.origin-what, .origin-free {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+.origin-free { font-weight: 600; color: var(--warn); }
+.origin-how-title {
+  margin: 10px 0 6px;
+  font-weight: 600;
+  color: var(--text);
+}
 .origin-how-steps {
-  margin: 0;
-  padding: 0 0 0 1.2em;
+  margin: 0 0 12px;
+  padding: 0 0 0 1.25em;
 }
 .origin-how-steps li {
   margin: 0 0 8px;
@@ -454,6 +477,46 @@ pre {
   font-size: 0.95rem;
 }
 .origin-how-steps li:last-child { margin-bottom: 0; }
+.origin-console-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--tap);
+  margin: 4px 0 14px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, #1b6f74, #4b3d86);
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+}
+.origin-console-btn:hover, .origin-console-btn:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.origin-paste-label {
+  color: var(--text) !important;
+  font-size: 0.95rem !important;
+  font-weight: 600;
+}
+.origin-test-btn {
+  width: 100%;
+  margin: 0 0 12px;
+}
+.origin-toy {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.origin-device-more summary {
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-weight: 400;
+}
 
 .fallback {
   margin-top: 12px;

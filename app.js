@@ -39,7 +39,7 @@
       code: "Circuit recipe the machine can read — no need to memorize",
       counts: "Local sim",
       shots: "shots",
-      empty: "Type a prompt and Run to ask Kimi for a 1–4 qubit teaching circuit. Preset chips run canned demos locally without calling Kimi.",
+      empty: "Type a prompt and Run — Kimi works with Settings blank if the site has shared Kimi. Preset chips run canned demos locally without calling Kimi.",
       preset: "preset",
       designing: "Kimi is designing a circuit…",
       stillThinking: "still thinking, not frozen",
@@ -52,14 +52,17 @@
       ],
       proxyConnected: "proxy connected",
       proxyMissing: "proxy missing",
-      moonshotKey: "🔑 Moonshot API key (Kimi)",
-      moonshotKeyHint: "Visitor's browser only (localStorage). Sent to the proxy for Kimi. Never logged.",
-      moonshotKeyHow: "🗝️ How to get a Moonshot key",
+      moonshotKey: "🔑 Moonshot API key (Kimi) — optional",
+      moonshotKeyHint: "Leave blank to use the site's shared Kimi. If you paste your own key, yours wins. Browser only — never logged.",
+      moonshotKeyHow: "Want your own Moonshot key? (optional)",
       moonshotKeyHow1: "🌐 Sign up at platform.moonshot.cn",
       moonshotKeyHow2: "📋 Copy your API key and paste it above",
-      moonshotKeyHow3: "✅ The key stays in your browser only",
+      moonshotKeyHow3: "✅ Your key stays in this browser only",
+      kimiSharedOn: "Shared Kimi is on — you can leave this blank.",
+      kimiSharedOff: "No shared Kimi on this server right now. Paste your own Moonshot key, or Run will fail.",
       apiBase: "API base URL",
       model: "Model",
+      settingsAdvanced: "Advanced (usually leave this)",
       fallback: "Kimi did not produce a usable circuit. Preset chips below still run locally — they are canned demos, not a silent substitute for this prompt.",
       aboutBody1: "I am a Mathayom 6 student in the SCiUS BUU program at Piboonbumpen Demonstration School, Burapha University, with a strong interest in artificial intelligence, machine learning, computer vision, robotics, and building practical technology.",
       logoPiboon: "Piboonbumpen",
@@ -68,7 +71,7 @@
       aboutSchool: "Currently enrolled, M.6 / Grade 12, SCiUS BUU (วมว.), Piboonbumpen Demonstration School, Burapha University. Bangsaen, Chonburi, Thailand.",
       aboutGoal: "2026 application goal (not admitted): B.Eng. Robotics and AI Engineering (International Program), Department of Robotics and AI Engineering, School of Engineering, KMITL.",
       aboutEndorsement: "No official endorsement by the school, SCiUS, Burapha University, or KMITL.",
-      aboutProduct: "ทดลองควอนตัม.com is a teaching prototype. Visitor keys in Settings. No owner keys on the server. No quantum advantage, no KMITL admission.",
+      aboutProduct: "ทดลองควอนตัม.com is a teaching prototype. Shared Kimi can run from a server env var. Origin keys stay in the visitor's browser. No quantum advantage, no KMITL admission.",
       aboutName: "Chonlatee Sukwiwattanaporn (ชลธี สุขวิวัฒนพร)",
       aboutTarget: "B.Eng. Robotics and AI, KMITL (target)",
       aboutMore: "อ่านเพิ่ม / more",
@@ -82,26 +85,31 @@
       qeEval: "Approx evaluation 4.3/5 (from product brief; not re-measured here).",
       sisterLink: "เรียนควอนตัม",
       labLine: "Lab classroom at เรียนควอนตัม.com",
-      originKey: "🔑 Origin API key",
-      originDevice: "🧊 Device id",
+      originBlockTitle: "🔥 Origin / Wukong — ชิปตู้เย็นจริง · a real fridge chip (free tier)",
+      originWhat: "Origin คือชิปควอนตัมในตู้เย็นจริงที่จีน (Wukong 180) ไม่ใช่ซิมในเบราว์เซอร์นี้ · a real fridge chip, not the browser sim.",
+      originFree: "สมัครฟรี + ขอ API key ฟรีเทียร์ได้ พอสำหรับเดโมนี้ ไม่ต้องรูดบัตร · signup + key are free enough for this demo.",
+      originHowTitle: "ทำยังไง — 5 ขั้น แป๊บเดียว / 5 quick steps",
+      originHow1: "กดปุ่มด้านล่าง เปิดคอนโซล Origin · tap below to open the console",
+      originHow2: "สมัครหรือล็อกอิน ฟรี · sign up / log in — it's free",
+      originHow3: "เมนูซ้าย → Account / 账户 → API Key",
+      originHow4: "ก็อปปี้คีย์ แล้ววางในช่องด้านล่างนี้ ↓ · paste it in the box below",
+      originHow5: "กด Test key ให้ขึ้น ✅ แล้วไปยิงชิปได้ · then you can fire the chip",
+      originPasteHere: "วาง Origin API key ตรงนี้ · paste the key here",
+      originKeyHint: "คีย์อยู่แค่ในเบราว์เซอร์เธอ ไม่ได้เก็บบนเซิร์ฟเวอร์ ไม่ถูก log · browser only, never logged.",
+      originConsoleBtn: "เปิดคอนโซล Origin — สมัครฟรี · open console, free signup",
+      originDeviceHint: "ชิปเดโม: WK_C180 (ไม่ต้องเปลี่ยน / leave it)",
+      originDevice: "Device id",
+      originToyNote: "ยังเป็นของเล่นสอน ชิปจริงช้า มี noise — ไม่ได้ชนะคอมบ้าน. Still a teaching toy — not quantum advantage.",
       originTest: "✅ Test key",
       originTesting: "⏳ Testing key…",
       originConnected: "✅ connected",
-      originKeyHint: "This machine only (localStorage). Sent to 127.0.0.1. Never logged.",
-      originKeyHow: "🗝️ How to get an Origin key",
-      originKeyHow1: "🌐 Log in / sign up on the Origin console",
-      originKeyHow2: "👤 Left menu → Account / 账户 → API Key",
-      originKeyHow3: "📋 Create or copy the key, paste it above",
-      originKeyHow4: "✅ Hit Test key",
-      originKeyHow5: "🧊 Wukong spends real Origin credit — not always free",
-      originKeyHowLink: "Open console",
       wukongBtn: "🔥 ยิงเข้า Wukong 180 จริง",
       wukongNeedResult: "Run a circuit locally first.",
-      wukongNeedKey: "Origin API key is empty. Paste it in Settings, then Test key.",
+      wukongNeedKey: "ยังไม่มี Origin key — เปิด Settings แล้วตามขั้นตอนฟรี 5 ข้อ · paste a free Origin key in Settings.",
       wukongNeedPkg: "qpanda3-runtime is not installed in the proxy Python.",
       wukongConfirmTitle: "Send to Wukong 180?",
       wukongConfirm1: "This is a real superconducting QPU queue.",
-      wukongConfirm2: "It costs Origin cloud time.",
+      wukongConfirm2: "A real fridge queue can take many minutes. The app is not frozen.",
       wukongConfirm3: "The result will be noisier than the local sim.",
       wukongConfirm4: "This is not quantum advantage.",
       wukongConfirmOk: "Confirm",
@@ -134,7 +142,7 @@
     },
     th: {
       title: "ทดลองควอนตัม.com",
-      sub: "ต้นแบบสอน · คีย์จากผู้เยี่ยมชม",
+      sub: "ต้นแบบสอน · Kimi ใช้ได้เลย",
       honesty: "แอปนี้สอนด้วยของเล่น 1–4 ควิบิต ชิปจริงช้า แพง และมี noise — ไม่ได้ชนะคอมพิวเตอร์บ้าน",
       promptLabel: "พิมพ์วงจรจิ๋วเป็นไทยหรืออังกฤษ",
       placeholder: "เช่น ของเล่นหมา/แมว, แมวชโรดิงเงอร์, หรือ Hadamard สองครั้ง…",
@@ -152,7 +160,7 @@
       code: "สูตรวงจรแบบที่เครื่องอ่านได้ — ไม่ต้องท่อง",
       counts: "ซิมท้องถิ่น",
       shots: "ช็อต",
-      empty: "พิมพ์ข้อความแล้วกดรัน เพื่อให้ Kimi ออกแบบวงจรสอน 1–4 คิวบิต ชิป preset รันวงจรสำเร็จรูปในเครื่อง โดยไม่เรียก Kimi",
+      empty: "พิมพ์แล้วกดรันได้เลย ไม่ต้องวางคีย์ Kimi ถ้าไซต์เปิดคีย์รวมไว้ ชิป preset รันในเครื่อง โดยไม่เรียก Kimi",
       preset: "preset",
       designing: "Kimi กำลังออกแบบวงจร…",
       stillThinking: "ยังคิดอยู่ ไม่ได้ค้าง",
@@ -165,14 +173,17 @@
       ],
       proxyConnected: "proxy connected",
       proxyMissing: "proxy missing",
-      moonshotKey: "🔑 Moonshot API key (Kimi)",
-      moonshotKeyHint: "เก็บในเบราว์เซอร์เท่านั้น (localStorage) ส่งไปพร็อกซีสำหรับ Kimi ไม่ถูก log",
-      moonshotKeyHow: "🗝️ เอา Moonshot key ยังไง",
+      moonshotKey: "🔑 Moonshot API key (Kimi) — ว่างได้",
+      moonshotKeyHint: "ว่างได้เลย ไซต์นี้ยืม Kimi ให้แล้ว ถ้าวางคีย์ตัวเอง จะใช้ของเธอก่อน คีย์อยู่แค่ในเบราว์เซอร์ ไม่ถูก log",
+      moonshotKeyHow: "อยากใช้คีย์ตัวเอง? (ไม่บังคับ)",
       moonshotKeyHow1: "🌐 สมัครที่ platform.moonshot.cn",
       moonshotKeyHow2: "📋 ก็อปปี้ API key แล้ววางในช่องด้านบน",
-      moonshotKeyHow3: "✅ คีย์อยู่ในเบราว์เซอร์เท่านั้น",
+      moonshotKeyHow3: "✅ คีย์อยู่ในเบราว์เซอร์นี้เท่านั้น",
+      kimiSharedOn: "Kimi พร้อมใช้ — ไม่ต้องวางคีย์",
+      kimiSharedOff: "เซิร์ฟเวอร์ยังไม่มีคีย์รวม วาง Moonshot key ของเธอ ไม่งั้นกดรันแล้วจะเฟล",
       apiBase: "API base URL",
       model: "โมเดล",
+      settingsAdvanced: "ขั้นสูง (ส่วนใหญ่ไม่ต้องยุ่ง)",
       fallback: "Kimi ไม่ได้ให้วงจรที่ใช้ได้ ชิป preset ด้านบนยังรันในเครื่องได้ — เป็นเดโมสำเร็จรูป ไม่ได้แอบแทนข้อความนี้",
       aboutBody1: "I am a Mathayom 6 student in the SCiUS BUU program at Piboonbumpen Demonstration School, Burapha University, with a strong interest in artificial intelligence, machine learning, computer vision, robotics, and building practical technology.",
       logoPiboon: "สาธิตพิบูลบำเพ็ญ",
@@ -181,7 +192,7 @@
       aboutSchool: "กำลังศึกษา ม.6 โปรแกรม SCiUS BUU (วมว.) โรงเรียนสาธิตพิบูลบำเพ็ญ มหาวิทยาลัยบูรพา บางแสน ชลบุรี ประเทศไทย",
       aboutGoal: "เป้าสมัครปี 2026 (ยังไม่ได้รับเข้า): B.Eng. Robotics and AI Engineering (International Program), Department of Robotics and AI Engineering, School of Engineering, KMITL",
       aboutEndorsement: "ไม่มีข้อความรับรองอย่างเป็นทางการจากโรงเรียน, SCiUS, มหาวิทยาลัยบูรพา หรือ KMITL",
-      aboutProduct: "ทดลองควอนตัม.com เป็นต้นแบบสอน คีย์จากผู้เยี่ยมชมใน Settings ไม่มีคีย์เจ้าของบนเซิร์ฟเวอร์ ไม่มี quantum advantage ไม่อ้างการรับเข้า KMITL",
+      aboutProduct: "ทดลองควอนตัม.com เป็นต้นแบบสอน Kimi รวมอยู่บนเซิร์ฟเวอร์ได้ Origin key อยู่ที่เบราว์เซอร์ผู้เยี่ยมชม ไม่มี quantum advantage ไม่อ้างการรับเข้า KMITL",
       aboutName: "Chonlatee Sukwiwattanaporn (ชลธี สุขวิวัฒนพร)",
       aboutTarget: "B.Eng. Robotics and AI, KMITL (target)",
       aboutMore: "อ่านเพิ่ม / more",
@@ -195,28 +206,33 @@
       qeEval: "ประเมินโดยประมาณ 4.3/5 (จากบรีฟของงาน ไม่ได้วัดซ้ำที่นี่)",
       sisterLink: "เรียนควอนตัม",
       labLine: "ห้องแล็บสถานีอยู่ที่ เรียนควอนตัม.com",
-      originKey: "🔑 Origin API key",
-      originDevice: "🧊 Device id",
-      originTest: "✅ Test key",
+      originBlockTitle: "🔥 Origin / Wukong — ชิปตู้เย็นจริง (ฟรีเทียร์)",
+      originWhat: "Origin คือชิปควอนตัมในตู้เย็นจริงที่จีน (Wukong 180) ไม่ใช่ซิมในเบราว์เซอร์นี้",
+      originFree: "สมัครฟรี + ขอ API key ฟรีเทียร์ได้ พอสำหรับเดโมนี้ ไม่ต้องรูดบัตร · free enough for this demo",
+      originHowTitle: "ทำยังไง — 5 ขั้น แป๊บเดียว",
+      originHow1: "กดปุ่มด้านล่าง เปิดคอนโซล Origin",
+      originHow2: "สมัครหรือล็อกอิน ฟรี",
+      originHow3: "เมนูซ้าย → Account / 账户 → API Key",
+      originHow4: "ก็อปปี้คีย์ แล้ววางในช่องด้านล่างนี้ ↓",
+      originHow5: "กด Test key ให้ขึ้น ✅ แล้วไปยิงชิปได้",
+      originPasteHere: "วาง Origin API key ตรงนี้",
+      originKeyHint: "คีย์อยู่แค่ในเบราว์เซอร์เธอ ไม่ได้เก็บบนเซิร์ฟเวอร์ ไม่ถูก log",
+      originConsoleBtn: "เปิดคอนโซล Origin — สมัครฟรี",
+      originDeviceHint: "ชิปเดโม: WK_C180 (ไม่ต้องเปลี่ยน)",
+      originDevice: "Device id",
+      originToyNote: "ยังเป็นของเล่นสอน ชิปจริงช้า มี noise — ไม่ได้ชนะคอมบ้าน ไม่ใช่ quantum advantage",
+      originTest: "✅ เทสคีย์",
       originTesting: "⏳ กำลังทดสอบคีย์…",
       originConnected: "✅ connected",
-      originKeyHint: "เก็บในเครื่องนี้เท่านั้น ส่งไป 127.0.0.1 ไม่ถูก log",
-      originKeyHow: "🗝️ เอา Origin key ยังไง",
-      originKeyHow1: "🌐 ล็อกอิน / สมัครบนคอนโซล Origin",
-      originKeyHow2: "👤 เมนูซ้าย → 账户 / Account → API Key",
-      originKeyHow3: "📋 สร้างหรือก็อปปี้คีย์ แล้ววางในช่องด้านบน",
-      originKeyHow4: "✅ กด Test key",
-      originKeyHow5: "🧊 ชิป Wukong ใช้เครดิต Origin จริง — ไม่ฟรีเสมอไป",
-      originKeyHowLink: "เปิดคอนโซล",
       wukongBtn: "🔥 ยิงเข้า Wukong 180 จริง",
       wukongNeedResult: "รันวงจรบนซิมท้องถิ่นก่อน",
-      wukongNeedKey: "Origin API key ว่าง ใส่ใน Settings แล้วกด Test key",
+      wukongNeedKey: "ยังไม่มี Origin key — เปิด Settings แล้วตามขั้นตอนฟรี 5 ข้อ",
       wukongNeedPkg: "qpanda3-runtime ยังไม่ติดตั้งใน Python ของพร็อกซี",
       wukongConfirmTitle: "ส่งเข้า Wukong 180?",
       wukongConfirm1: "นี่คือคิว QPU ตัวนำยิ่งยวดจริง",
-      wukongConfirm2: "ใช้เวลา Origin cloud",
+      wukongConfirm2: "คิวตู้เย็นจริงรอนานได้หลายนาที ไม่ใช่แอปค้าง",
       wukongConfirm3: "ผลจะnoisy กว่าซิมท้องถิ่น",
-      wukongConfirm4: "นี่ไม่ใช่ quantum advantage",
+      wukongConfirm4: "นี่ไม่ใช่ quantum advantage.",
       wukongConfirmOk: "Confirm",
       wukongConfirmCancel: "Cancel",
       wukongWaitPhrases: ["queued", "running"],
@@ -254,7 +270,7 @@
     busy: false,
     waitTimer: null,
     waitStarted: 0,
-    proxy: { ok: false, key_present: false, qpanda_present: false, checked: false },
+    proxy: { ok: false, key_present: false, kimi_shared: false, qpanda_present: false, checked: false },
     baseUrl: localStorage.getItem(BASE_KEY) || DEFAULT_BASE,
     model: localStorage.getItem(MODEL_KEY) || DEFAULT_MODEL,
     moonshotKey: localStorage.getItem(MOONSHOT_KEY) || "",
@@ -405,7 +421,7 @@
 
   function moonshotKeyHowHtml() {
     return (
-      "<details class='about-more origin-how'>" +
+      "<details class='about-more moonshot-how'>" +
         "<summary>" + t("moonshotKeyHow") + "</summary>" +
         "<ol class='origin-how-steps'>" +
           "<li>" + t("moonshotKeyHow1") + "</li>" +
@@ -416,51 +432,72 @@
     );
   }
 
-  function originKeyHowHtml() {
+  function originInstallHtml() {
+    var okey = state.originKey || "";
+    var odev = state.originDevice || DEFAULT_DEVICE;
     return (
-      "<details class='about-more origin-how'>" +
-        "<summary>" + t("originKeyHow") + "</summary>" +
-        "<a class='origin-how-link' href='https://console.originqc.com.cn/en/' target='_blank' rel='noopener noreferrer'>🔗 " + t("originKeyHowLink") + " · console.originqc.com.cn</a>" +
+      "<section class='origin-install' aria-labelledby='originInstallTitle'>" +
+        "<p class='origin-free-pill'>ฟรี · free tier</p>" +
+        "<h3 id='originInstallTitle'>" + t("originBlockTitle") + "</h3>" +
+        "<p class='origin-what'>" + t("originWhat") + "</p>" +
+        "<p class='origin-free'>" + t("originFree") + "</p>" +
+        "<p class='origin-how-title'>" + t("originHowTitle") + "</p>" +
         "<ol class='origin-how-steps'>" +
-          "<li>" + t("originKeyHow1") + "</li>" +
-          "<li>" + t("originKeyHow2") + "</li>" +
-          "<li>" + t("originKeyHow3") + "</li>" +
-          "<li>" + t("originKeyHow4") + "</li>" +
-          "<li>" + t("originKeyHow5") + "</li>" +
+          "<li>" + t("originHow1") + "</li>" +
+          "<li>" + t("originHow2") + "</li>" +
+          "<li>" + t("originHow3") + "</li>" +
+          "<li>" + t("originHow4") + "</li>" +
+          "<li>" + t("originHow5") + "</li>" +
         "</ol>" +
-      "</details>"
+        "<a class='origin-console-btn' href='https://console.originqc.com.cn/en/' target='_blank' rel='noopener noreferrer'>" + t("originConsoleBtn") + "</a>" +
+        "<div class='settings-field'><label class='origin-paste-label' for='originKey'>" + t("originPasteHere") + "</label>" +
+        "<input id='originKey' type='password' value='" + escapeAttr(okey) + "' autocomplete='off'></div>" +
+        "<p class='settings-note'>" + t("originKeyHint") + "</p>" +
+        "<p id='originTestMsg' class='settings-note'></p>" +
+        "<button class='btn primary origin-test-btn' type='button' id='btnOriginTest'>" + t("originTest") + "</button>" +
+        "<p class='origin-toy'>" + t("originToyNote") + "</p>" +
+        "<details class='about-more origin-device-more'>" +
+          "<summary>" + t("originDeviceHint") + "</summary>" +
+          "<div class='settings-field'><label for='originDevice'>" + t("originDevice") + "</label>" +
+          "<input id='originDevice' type='text' value='" + escapeAttr(odev) + "' autocomplete='off'></div>" +
+        "</details>" +
+      "</section>"
     );
   }
 
+  function kimiHintText() {
+    if (state.proxy.checked && state.proxy.kimi_shared) return t("kimiSharedOn");
+    if (state.proxy.checked && !state.proxy.kimi_shared) return t("kimiSharedOff");
+    return t("moonshotKeyHint");
+  }
+
   function renderSettings() {
+    var box = $("settingsInner");
+    if (!box) return;
     var base = state.baseUrl || DEFAULT_BASE;
     var model = state.model || DEFAULT_MODEL;
     var aiSel = base.indexOf("moonshot.cn") !== -1 ? "cn" : "ai";
     var mkey = state.moonshotKey || "";
-    var okey = state.originKey || "";
-    var odev = state.originDevice || DEFAULT_DEVICE;
-    $("settingsInner").innerHTML =
+    box.innerHTML =
       "<h2>" + t("settings") + "</h2>" +
       "<p>" + proxyPillHtml() + "</p>" +
-      "<p class='settings-note'>" + t("moonshotKeyHint") + "</p>" +
-      "<div class='settings-field'><label for='moonshotKey'>" + t("moonshotKey") + "</label>" +
-      "<input id='moonshotKey' type='password' value='" + escapeAttr(mkey) + "' autocomplete='off'></div>" +
-      moonshotKeyHowHtml() +
-      "<div class='settings-field'><label for='apiBase'>" + t("apiBase") + "</label>" +
-      "<select id='apiBase'>" +
-        "<option value='https://api.moonshot.ai'" + (aiSel === "ai" ? " selected" : "") + ">https://api.moonshot.ai</option>" +
-        "<option value='https://api.moonshot.cn'" + (aiSel === "cn" ? " selected" : "") + ">https://api.moonshot.cn</option>" +
-      "</select></div>" +
-      "<div class='settings-field'><label for='apiModel'>" + t("model") + "</label>" +
-      "<input id='apiModel' type='text' value='" + escapeAttr(model) + "' autocomplete='off'></div>" +
-      "<p class='settings-note'>" + t("originKeyHint") + "</p>" +
-      "<div class='settings-field'><label for='originKey'>" + t("originKey") + "</label>" +
-      "<input id='originKey' type='password' value='" + escapeAttr(okey) + "' autocomplete='off'></div>" +
-      originKeyHowHtml() +
-      "<div class='settings-field'><label for='originDevice'>" + t("originDevice") + "</label>" +
-      "<input id='originDevice' type='text' value='" + escapeAttr(odev) + "' autocomplete='off'></div>" +
-      "<p id='originTestMsg' class='settings-note'></p>" +
-      "<div class='close-row'><button class='btn' type='button' id='btnOriginTest'>" + t("originTest") + "</button></div>" +
+      "<section class='kimi-settings'>" +
+        "<p class='settings-note' id='kimiHint'>" + kimiHintText() + "</p>" +
+        "<div class='settings-field'><label for='moonshotKey'>" + t("moonshotKey") + "</label>" +
+        "<input id='moonshotKey' type='password' value='" + escapeAttr(mkey) + "' autocomplete='off'></div>" +
+        moonshotKeyHowHtml() +
+        "<details class='about-more settings-advanced'>" +
+          "<summary>" + t("settingsAdvanced") + "</summary>" +
+          "<div class='settings-field'><label for='apiBase'>" + t("apiBase") + "</label>" +
+          "<select id='apiBase'>" +
+            "<option value='https://api.moonshot.ai'" + (aiSel === "ai" ? " selected" : "") + ">https://api.moonshot.ai</option>" +
+            "<option value='https://api.moonshot.cn'" + (aiSel === "cn" ? " selected" : "") + ">https://api.moonshot.cn</option>" +
+          "</select></div>" +
+          "<div class='settings-field'><label for='apiModel'>" + t("model") + "</label>" +
+          "<input id='apiModel' type='text' value='" + escapeAttr(model) + "' autocomplete='off'></div>" +
+        "</details>" +
+      "</section>" +
+      originInstallHtml() +
       "<div class='close-row'><button class='btn' type='button' id='btnCloseSettings'>" + t("close") + "</button></div>";
     $("btnCloseSettings").addEventListener("click", function () { closeSettings(); });
     $("btnOriginTest").addEventListener("click", testOriginKey);
@@ -482,6 +519,10 @@
       $("apiModel").value = v;
       localStorage.setItem(MODEL_KEY, v);
     });
+    $("originKey").addEventListener("input", function () {
+      state.originKey = $("originKey").value || "";
+      localStorage.setItem(ORIGIN_KEY, state.originKey);
+    });
     $("originKey").addEventListener("change", function () {
       state.originKey = $("originKey").value || "";
       localStorage.setItem(ORIGIN_KEY, state.originKey);
@@ -502,33 +543,45 @@
   function closeAbout() { $("about").classList.remove("open"); }
   function openSettings() {
     $("settings").classList.add("open");
-    probeHealth();
+    probeHealth().then(function () {
+      if ($("settings") && $("settings").classList.contains("open")) renderSettings();
+    });
   }
   function closeSettings() { $("settings").classList.remove("open"); }
+
+  function applyProxyHealth(res, j) {
+    var shared = !!(j && (j.kimi_shared || j.key_present));
+    state.proxy = {
+      ok: !!(res && res.ok && j && j.ok && j.proxy),
+      key_present: shared,
+      kimi_shared: shared,
+      qpanda_present: !!(j && j.qpanda_present),
+      checked: true
+    };
+    var pill = $("proxyPill");
+    if (pill) {
+      pill.className = "proxy-pill " + (state.proxy.ok ? "ok" : "missing");
+      pill.textContent = state.proxy.ok ? t("proxyConnected") : t("proxyMissing");
+    }
+    var hint = $("kimiHint");
+    if (hint) hint.textContent = kimiHintText();
+    return state.proxy;
+  }
 
   function probeHealth() {
     return fetch("/health", { method: "GET", cache: "no-store" }).then(function (res) {
       return res.json().then(function (j) {
-        state.proxy = {
-          ok: !!(res.ok && j && j.ok && j.proxy),
-          key_present: !!(j && j.key_present),
-          qpanda_present: !!(j && j.qpanda_present),
-          checked: true
-        };
-        var pill = $("proxyPill");
-        if (pill) {
-          pill.className = "proxy-pill " + (state.proxy.ok ? "ok" : "missing");
-          pill.textContent = state.proxy.ok ? t("proxyConnected") : t("proxyMissing");
-        }
-        return state.proxy;
+        return applyProxyHealth(res, j);
       });
     }).catch(function () {
-      state.proxy = { ok: false, key_present: false, qpanda_present: false, checked: true };
+      state.proxy = { ok: false, key_present: false, kimi_shared: false, qpanda_present: false, checked: true };
       var pill = $("proxyPill");
       if (pill) {
         pill.className = "proxy-pill missing";
         pill.textContent = t("proxyMissing");
       }
+      var hint = $("kimiHint");
+      if (hint) hint.textContent = kimiHintText();
       return state.proxy;
     });
   }
@@ -2939,6 +2992,7 @@
     KNOWN_BELL_JOB_ID: KNOWN_BELL_JOB_ID,
     WUKONG_JOB_KEY: WUKONG_JOB_KEY,
     bellDemoFingerprint: bellDemoFingerprint,
-    sanitizeStoryLines: sanitizeStoryLines
+    sanitizeStoryLines: sanitizeStoryLines,
+    I18N: I18N
   };
 })();

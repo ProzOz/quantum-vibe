@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-# ทดลองควอนตัม.com proxy. Visitors paste their own API keys in Settings.
-# Never logs keys or request bodies. Origin routes need qpanda3-runtime.
+# ทดลองควอนตัม.com proxy. Shared Kimi uses Coolify env MOONSHOT_API_KEY
+# (or KIMI_API_KEY). Visitor Settings key wins if pasted. Origin keys stay
+# visitor-pasted. Never logs keys or request bodies. Never put secrets in git.
 """ทดลองควอนตัม.com planner proxy (stdlib only)."""
 
 from __future__ import annotations
@@ -11,6 +12,7 @@ import os
 import re
 import sys
 import threading
+import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
@@ -27,6 +29,13 @@ DEFAULT_BASE = "https://api.moonshot.ai"
 ALLOWED_HOSTS = frozenset(("api.moonshot.ai", "api.moonshot.cn"))
 MAX_GATES = 20
 MAX_PROMPT = 4000
+MAX_TOKENS = 800
+PLAN_TIMEOUT_S = 25
+PLAN_RATE_WINDOW_S = 60
+PLAN_RATE_MAX = 8
+SERVER_KEY_ENVS = ("MOONSHOT_API_KEY", "KIMI_API_KEY")
+_PLAN_HITS: dict[str, list[float]] = {}
+_PLAN_HITS_LOCK = threading.Lock()
 ALLOWED_OPS = frozenset(
     ("H", "X", "Y", "Z", "S", "T", "CX", "CZ", "SWAP", "RX", "RY", "RZ")
 )
@@ -786,14 +795,64 @@ def origin_job(key: str, job_id: Any, n_qubits: Any) -> dict:
     }
 
 
+def server_moonshot_key() -> str:
+    """Owner Coolify/server secret. Never log or return this value."""
+    for name in SERVER_KEY_ENVS:
+        v = os.environ.get(name)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+    return ""
+
+
 def key_present() -> bool:
-    """Check if owner env key is present. Not used for visitor keys."""
-    return bool(os.environ.get("MOONSHOT_API_KEY"))
+    """True if a shared Kimi env key is set. Does not reveal the secret."""
+    return bool(server_moonshot_key())
 
 
-def _get_key() -> str:
-    """Get owner env key. Not used for visitor keys."""
-    return os.environ.get("MOONSHOT_API_KEY") or ""
+def resolve_moonshot_key(visitor: Any) -> tuple[str, str]:
+    """Prefer visitor Settings key; else server env. source is visitor|server|''."""
+    if isinstance(visitor, str) and visitor.strip():
+        return visitor.strip(), "visitor"
+    env = server_moonshot_key()
+    if env:
+        return env, "server"
+    return "", ""
+
+
+def reset_plan_rate_limit() -> None:
+    with _PLAN_HITS_LOCK:
+        _PLAN_HITS.clear()
+
+
+def client_ip(handler: SimpleHTTPRequestHandler) -> str:
+    xff = (handler.headers.get("X-Forwarded-For") or "").strip()
+    if xff:
+        return xff.split(",")[0].strip()[:64] or "unknown"
+    real = (handler.headers.get("X-Real-IP") or "").strip()
+    if real:
+        return real[:64]
+    try:
+        return str(handler.client_address[0])
+    except Exception:
+        return "unknown"
+
+
+def plan_rate_ok(ip: str) -> bool:
+    """Per-IP sliding window for POST /plan. True = allow this request."""
+    now = time.time()
+    key = (ip or "unknown")[:64]
+    with _PLAN_HITS_LOCK:
+        hits = [t for t in _PLAN_HITS.get(key, []) if now - t < PLAN_RATE_WINDOW_S]
+        if len(_PLAN_HITS) > 4000 and key not in _PLAN_HITS:
+            stale = [k for k, ts in _PLAN_HITS.items() if not ts or now - ts[-1] > PLAN_RATE_WINDOW_S]
+            for k in stale[:500]:
+                _PLAN_HITS.pop(k, None)
+        if len(hits) >= PLAN_RATE_MAX:
+            _PLAN_HITS[key] = hits
+            return False
+        hits.append(now)
+        _PLAN_HITS[key] = hits
+        return True
 
 
 def as_string(v: Any) -> str:
@@ -974,7 +1033,7 @@ def moonshot_chat(prompt: str, endpoint: str, model: str, key: str) -> dict:
             {"role": "system", "content": SYSTEM_PROMPT + SCHEMA_HINT},
             {"role": "user", "content": prompt},
         ],
-        "max_tokens": 800,
+        "max_tokens": MAX_TOKENS,
         "reasoning_effort": "low",
         "response_format": {"type": "json_object"},
     }
@@ -987,7 +1046,7 @@ def moonshot_chat(prompt: str, endpoint: str, model: str, key: str) -> dict:
     def _do(body: bytes) -> dict:
         req = Request(endpoint, data=body, headers=headers, method="POST")
         try:
-            with urlopen(req, timeout=90) as resp:
+            with urlopen(req, timeout=PLAN_TIMEOUT_S) as resp:
                 raw = resp.read().decode("utf-8", errors="replace")
         except HTTPError as e:
             err_body = ""
@@ -1096,6 +1155,7 @@ class Handler(SimpleHTTPRequestHandler):
                     "ok": True,
                     "proxy": True,
                     "qpanda_present": qpanda_present(),
+                    "kimi_shared": key_present(),
                 },
             )
             return
@@ -1123,12 +1183,25 @@ class Handler(SimpleHTTPRequestHandler):
         if not isinstance(body, dict):
             self._send_json(400, {"error": "request body must be a JSON object"})
             return
-        moonshot_key = body.get("moonshot_key")
-        if not isinstance(moonshot_key, str):
-            moonshot_key = ""
-        moonshot_key = moonshot_key.strip()
+        ip = client_ip(self)
+        if not plan_rate_ok(ip):
+            self._send_json(
+                429,
+                {"error": "Slow down — too many Kimi requests from this network. Try again in a minute."},
+            )
+            return
+        visitor_key = body.get("moonshot_key")
+        moonshot_key, key_source = resolve_moonshot_key(visitor_key)
         if not moonshot_key:
-            self._send_json(400, {"error": "moonshot_key is required. Paste your Moonshot API key in Settings."})
+            self._send_json(
+                400,
+                {
+                    "error": (
+                        "No Moonshot key. Leave Settings blank if the site has shared Kimi, "
+                        "or paste your own Moonshot API key."
+                    )
+                },
+            )
             return
         prompt = body.get("prompt")
         if not isinstance(prompt, str) or not prompt.strip():
@@ -1144,6 +1217,8 @@ class Handler(SimpleHTTPRequestHandler):
         except ValueError as e:
             self._send_json(400, {"error": str(e)})
             return
+        if key_source == "server":
+            model = DEFAULT_MODEL
         try:
             result = plan_from_kimi(prompt, endpoint, model, moonshot_key)
         except Exception:
@@ -1151,7 +1226,11 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if not result.get("ok"):
             code = int(result.get("http") or 502)
-            self._send_json(code, {"error": result.get("error") or "plan failed"})
+            err = sanitize_error(result.get("error") or "plan failed", moonshot_key)
+            low = err.lower()
+            if key_source == "server" and ("http 401" in low or "http 403" in low):
+                err = "Shared Kimi was rejected. Paste your own Moonshot key in Settings."
+            self._send_json(code, {"error": err})
             return
         self._send_json(200, result["plan"])
 
