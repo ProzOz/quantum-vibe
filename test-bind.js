@@ -274,6 +274,25 @@ eq("force-refresh Grover mode", QVApp.wukongPanelMode(groverRefresh), "mismatch"
 
 ok("no Origin fetch", fetchCalls.length === 0, "fetches=" + fetchCalls.length);
 
+var th = QVApp.I18N.th;
+var en = QVApp.I18N.en;
+ok("th origin free", /ฟรี/.test(th.originFree) && /ฟรี/.test(th.originBlockTitle), th.originFree);
+ok("en origin free", /free/i.test(en.originFree) && /free/i.test(en.originBlockTitle), en.originFree);
+ok("th origin is fridge chip", /ตู้เย็นจริง/.test(th.originWhat), th.originWhat);
+ok("en origin is fridge chip", /fridge/i.test(en.originWhat), en.originWhat);
+ok("th origin not always-paid warning", !/ไม่ฟรีเสมอไป/.test(th.originFree + th.originHow5));
+ok("en origin not always-paid warning", !/not always free/i.test(en.originFree + (en.originHow5 || "")));
+ok("th kimi optional", /ว่างได้/.test(th.moonshotKey), th.moonshotKey);
+ok("en kimi optional", /optional/i.test(en.moonshotKey), en.moonshotKey);
+ok("honesty banner stays th", /ของเล่น/.test(th.honesty) && /ไม่ได้ชนะ/.test(th.honesty), th.honesty);
+ok("honesty banner stays en", /teaching|toys/i.test(en.honesty) && /do not beat/i.test(en.honesty), en.honesty);
+ok("th origin no advantage claim as a feature", /ไม่ใช่ quantum advantage/.test(th.originToyNote), th.originToyNote);
+ok("en origin no advantage claim as a feature", /not quantum advantage/i.test(en.originToyNote), en.originToyNote);
+["originBlockTitle","originWhat","originFree","originHowTitle","originHow1","originHow2","originHow3","originHow4","originHow5","originPasteHere","originConsoleBtn","originToyNote","kimiSharedOn","kimiSharedOff","moonshotKeyHint"].forEach(function (k) {
+  ok("th has " + k, typeof th[k] === "string" && th[k].length > 4, k + "=" + th[k]);
+  ok("en has " + k, typeof en[k] === "string" && en[k].length > 4, k + "=" + en[k]);
+});
+
 if (failed) {
   console.error("\n" + failed + " failed");
   process.exit(1);
