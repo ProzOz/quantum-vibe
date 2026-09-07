@@ -580,6 +580,127 @@ pre {
   50% { opacity: 0.42; }
 }
 
+.wukong-dance-stage {
+  width: 100%;
+  max-width: 100%;
+  margin: 14px 0;
+  padding: 16px 12px;
+  background: linear-gradient(180deg, rgba(14, 21, 40, 0.6), rgba(7, 11, 22, 0.8));
+  border: 1px solid rgba(92, 225, 230, 0.25);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.wukong-circuit-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 140px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .qubit-dancer {
+    animation-duration: 1.2s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    transform-origin: center bottom;
+  }
+  
+  .qubit-dancer.q0 {
+    animation-name: qubit-bounce-1;
+    animation-delay: 0s;
+  }
+  
+  .qubit-dancer.q1 {
+    animation-name: qubit-bounce-2;
+    animation-delay: 0.15s;
+  }
+  
+  .qubit-dancer.q2 {
+    animation-name: qubit-bounce-3;
+    animation-delay: 0.3s;
+  }
+  
+  .gate-glow {
+    animation: gate-pulse 1.8s ease-in-out infinite;
+  }
+  
+  .circuit-line {
+    animation: line-flow 2.5s linear infinite;
+  }
+}
+
+@keyframes qubit-bounce-1 {
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+  }
+  25% { 
+    transform: translateY(-8px) scale(1.05); 
+  }
+  50% { 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+@keyframes qubit-bounce-2 {
+  0%, 100% { 
+    transform: translateY(0) scale(1) rotate(0deg); 
+  }
+  30% { 
+    transform: translateY(-10px) scale(1.08) rotate(-5deg); 
+  }
+  60% { 
+    transform: translateY(0) scale(1) rotate(0deg); 
+  }
+}
+
+@keyframes qubit-bounce-3 {
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+  }
+  35% { 
+    transform: translateY(-7px) scale(1.06); 
+  }
+  70% { 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+@keyframes gate-pulse {
+  0%, 100% { 
+    opacity: 0.7; 
+  }
+  50% { 
+    opacity: 1; 
+  }
+}
+
+@keyframes line-flow {
+  0% { 
+    stroke-dashoffset: 0; 
+  }
+  100% { 
+    stroke-dashoffset: -20; 
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wukong-circuit-svg {
+    opacity: 0.9;
+  }
+  .qubit-dancer {
+    animation: none !important;
+  }
+  .gate-glow {
+    opacity: 0.85;
+    animation: none !important;
+  }
+  .circuit-line {
+    animation: none !important;
+  }
+}
+
 .confirm-card {
   position: fixed;
   left: 50%;
@@ -618,6 +739,10 @@ pre {
   border-width: 2px;
   letter-spacing: 0.01em;
 }
+#wukongBox.wukong-wait {
+  position: relative;
+}
+
 .wukong-wait h3 {
   font-size: 1.12rem;
   color: var(--accent);

@@ -2412,6 +2412,144 @@
     }
   }
 
+  function appendDancingQubits(parent) {
+    var stage = document.createElement("div");
+    stage.className = "wukong-dance-stage";
+    stage.setAttribute("aria-hidden", "true");
+    
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "wukong-circuit-svg");
+    svg.setAttribute("viewBox", "0 0 300 120");
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    
+    var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    var gradientCyan = document.createElementNS("http://www.w3.org/2000/svg", "radialGradient");
+    gradientCyan.setAttribute("id", "qubitGradCyan");
+    var stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop1.setAttribute("offset", "0%");
+    stop1.setAttribute("stop-color", "#5ce1e6");
+    var stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop2.setAttribute("offset", "100%");
+    stop2.setAttribute("stop-color", "#2a8a8e");
+    gradientCyan.appendChild(stop1);
+    gradientCyan.appendChild(stop2);
+    defs.appendChild(gradientCyan);
+    
+    var gradientPurple = document.createElementNS("http://www.w3.org/2000/svg", "radialGradient");
+    gradientPurple.setAttribute("id", "qubitGradPurple");
+    var stop3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop3.setAttribute("offset", "0%");
+    stop3.setAttribute("stop-color", "#b388ff");
+    var stop4 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop4.setAttribute("offset", "100%");
+    stop4.setAttribute("stop-color", "#7c4dff");
+    gradientPurple.appendChild(stop3);
+    gradientPurple.appendChild(stop4);
+    defs.appendChild(gradientPurple);
+    
+    var gradientPink = document.createElementNS("http://www.w3.org/2000/svg", "radialGradient");
+    gradientPink.setAttribute("id", "qubitGradPink");
+    var stop5 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop5.setAttribute("offset", "0%");
+    stop5.setAttribute("stop-color", "#ffa0b8");
+    var stop6 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop6.setAttribute("offset", "100%");
+    stop6.setAttribute("stop-color", "#ff6b9d");
+    gradientPink.appendChild(stop5);
+    gradientPink.appendChild(stop6);
+    defs.appendChild(gradientPink);
+    svg.appendChild(defs);
+    
+    var lineY = [30, 60, 90];
+    for (var i = 0; i < 3; i++) {
+      var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("class", "circuit-line");
+      line.setAttribute("x1", "10");
+      line.setAttribute("y1", lineY[i]);
+      line.setAttribute("x2", "290");
+      line.setAttribute("y2", lineY[i]);
+      line.setAttribute("stroke", "rgba(92, 225, 230, 0.3)");
+      line.setAttribute("stroke-width", "2");
+      line.setAttribute("stroke-dasharray", "8 4");
+      svg.appendChild(line);
+    }
+    
+    var gateX = [80, 150, 220];
+    var gateColors = ["rgba(179, 136, 255, 0.5)", "rgba(92, 225, 230, 0.5)", "rgba(255, 160, 184, 0.5)"];
+    for (var j = 0; j < 3; j++) {
+      var gate = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      gate.setAttribute("class", "gate-glow");
+      gate.setAttribute("x", gateX[j] - 15);
+      gate.setAttribute("y", "15");
+      gate.setAttribute("width", "30");
+      gate.setAttribute("height", "90");
+      gate.setAttribute("fill", gateColors[j]);
+      gate.setAttribute("rx", "6");
+      svg.appendChild(gate);
+      
+      var gateLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      gateLabel.setAttribute("x", gateX[j]);
+      gateLabel.setAttribute("y", "63");
+      gateLabel.setAttribute("text-anchor", "middle");
+      gateLabel.setAttribute("fill", "#fff");
+      gateLabel.setAttribute("font-size", "14");
+      gateLabel.setAttribute("font-weight", "600");
+      gateLabel.setAttribute("opacity", "0.9");
+      gateLabel.textContent = ["H", "X", "CX"][j];
+      svg.appendChild(gateLabel);
+    }
+    
+    var qubitData = [
+      { y: lineY[0], color: "url(#qubitGradCyan)", face: "^_^", cls: "q0" },
+      { y: lineY[1], color: "url(#qubitGradPurple)", face: "◕‿◕", cls: "q1" },
+      { y: lineY[2], color: "url(#qubitGradPink)", face: "◠‿◠", cls: "q2" }
+    ];
+    
+    for (var k = 0; k < qubitData.length; k++) {
+      var qd = qubitData[k];
+      
+      var outerG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      outerG.setAttribute("transform", "translate(40, " + qd.y + ")");
+      
+      var innerG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      innerG.setAttribute("class", "qubit-dancer " + qd.cls);
+      
+      var body = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      body.setAttribute("cx", "0");
+      body.setAttribute("cy", "0");
+      body.setAttribute("r", "12");
+      body.setAttribute("fill", qd.color);
+      body.setAttribute("stroke", "#fff");
+      body.setAttribute("stroke-width", "2");
+      innerG.appendChild(body);
+      
+      var face = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      face.setAttribute("x", "0");
+      face.setAttribute("y", "1");
+      face.setAttribute("text-anchor", "middle");
+      face.setAttribute("dominant-baseline", "central");
+      face.setAttribute("fill", "#0e1528");
+      face.setAttribute("font-size", "10");
+      face.setAttribute("font-weight", "700");
+      face.textContent = qd.face;
+      innerG.appendChild(face);
+      
+      outerG.appendChild(innerG);
+      svg.appendChild(outerG);
+    }
+    
+    var fridge = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    fridge.setAttribute("x", "270");
+    fridge.setAttribute("y", "15");
+    fridge.setAttribute("text-anchor", "middle");
+    fridge.setAttribute("font-size", "18");
+    fridge.textContent = "❄️";
+    svg.appendChild(fridge);
+    
+    stage.appendChild(svg);
+    parent.appendChild(stage);
+  }
+
   function appendWukongWaitPanel(wkBox, pack, stale) {
     wkBox.classList.add("wukong-wait");
     var title = document.createElement("h3");
@@ -2427,6 +2565,9 @@
     hint.className = "wukong-hint";
     hint.textContent = t("wukongQueueHint");
     wkBox.appendChild(hint);
+    
+    appendDancingQubits(wkBox);
+    
     var wp = document.createElement("p");
     wp.className = "empty designing";
     wp.id = "wukongWait";
