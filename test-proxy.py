@@ -196,6 +196,15 @@ class HttpProxyTests(unittest.TestCase):
         self.assertEqual(code, 200)
         self.assertFalse(body.get("kimi_shared"))
 
+    def test_blank_prompt_does_not_burn_rate(self) -> None:
+        os.environ["MOONSHOT_API_KEY"] = SECRET
+        hdrs = {"X-Forwarded-For": "198.51.100.40"}
+        for _ in range(P.PLAN_RATE_MAX + 2):
+            code, body = self._post("/plan", {"prompt": "  ", "moonshot_key": ""}, headers=hdrs)
+            self.assertEqual(code, 400, body)
+        code, body = self._post("/plan", {"prompt": "toy", "moonshot_key": ""}, headers=hdrs)
+        self.assertEqual(code, 200, body)
+
     def test_rate_limit_http(self) -> None:
         os.environ["MOONSHOT_API_KEY"] = SECRET
         hdrs = {"X-Forwarded-For": "198.51.100.7"}
@@ -217,7 +226,7 @@ class HttpProxyTests(unittest.TestCase):
         for i in range(P.PLAN_RATE_MAX + 1):
             last, body = self._post(
                 "/plan",
-                {"prompt": "", "moonshot_key": ""},
+                {"prompt": "toy", "moonshot_key": ""},
                 headers={"X-Forwarded-For": "203.0.113.%d, %s" % (i, right)},
             )
         self.assertEqual(last, 429, body)

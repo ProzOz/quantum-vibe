@@ -46,7 +46,7 @@ Set **one** secret on the Coolify app as a **runtime** variable. Leave **Availab
 
 Visitor key in Settings **wins** when present. Empty Settings → proxy uses the env key.
 
-Light abuse protection on `POST /plan`: 8 requests / IP / 60s, plus a process-wide cap (default 40 / 60s, override with `PLAN_RATE_GLOBAL_MAX`). The per-IP key is the **rightmost** `X-Forwarded-For` hop (the address the reverse proxy appended). The leftmost hop is client-controlled, so it is not the bucket. Counters live in memory in one process — one Coolify replica, or each replica has its own cap. 800 max tokens, 25s timeout. Moonshot redirects are not followed (the bearer token must not be sent to another host). Shared-key requests are locked to model `kimi-k3`.
+Light abuse protection on `POST /plan`: 8 requests / IP / 60s, plus a process-wide cap (default 40 / 60s, override with `PLAN_RATE_GLOBAL_MAX`). A blank prompt, a missing key, or a rejected base URL returns 400 and does not spend that budget. The per-IP key is the **rightmost** `X-Forwarded-For` hop (the address the reverse proxy appended). The leftmost hop is client-controlled, so it is not the bucket. Counters live in memory in one process — one Coolify replica, or each replica has its own cap. 800 max tokens, 25s timeout. Moonshot redirects are not followed (the bearer token must not be sent to another host). Shared-key requests are locked to model `kimi-k3`.
 
 Origin routes (`/origin/test`, `/origin/sample`, `/origin/job`) have their own per-IP and process-wide caps, and at most 4 SDK calls run at once. A cached Wukong job can be polled only with the same key that submitted or attached it.
 

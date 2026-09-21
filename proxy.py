@@ -1373,13 +1373,6 @@ class Handler(SimpleHTTPRequestHandler):
         if not isinstance(body, dict):
             self._send_json(400, {"error": "request body must be a JSON object"})
             return
-        ip = client_ip(self)
-        if not plan_rate_ok(ip):
-            self._send_json(
-                429,
-                {"error": "Slow down — too many Kimi requests from this network. Try again in a minute."},
-            )
-            return
         visitor_key = body.get("moonshot_key")
         moonshot_key, key_source = resolve_moonshot_key(visitor_key)
         if not moonshot_key:
@@ -1409,6 +1402,15 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if key_source == "server":
             model = DEFAULT_MODEL
+        # Count only a real Kimi attempt. Empty boxes and bad URLs must not
+        # lock the shared key for everyone else on this process.
+        ip = client_ip(self)
+        if not plan_rate_ok(ip):
+            self._send_json(
+                429,
+                {"error": "Slow down — too many Kimi requests from this network. Try again in a minute."},
+            )
+            return
         try:
             result = plan_from_kimi(prompt, endpoint, model, moonshot_key)
         except Exception:

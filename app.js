@@ -47,7 +47,7 @@
       examplesLabel: "Tap a line — it only fills the box",
       examples: [
         "tiny 1-qubit toy: dog or cat? (not a real classifier)",
-        "ทำวงจรที่แมวชโรดิงเงอร์ตัดสินใจไม่ได้",
+        "a circuit where Schrödinger’s cat cannot decide",
         "smallest circuit that shows why two Hadamards can undo each other"
       ],
       proxyConnected: "proxy on",
@@ -129,16 +129,16 @@
       wukongCopiedId: "Copied",
       wukongSteps: "submit → compile → chip queue → read results",
       wukongQueueHint: "A real chip queue can take many minutes. The app is not frozen.",
-      wukongOpenConsole: "เปิดคอนโซล Origin",
-      wukongCheckAgain: "เช็คผลอีกครั้ง",
-      wukongThinking: "ยังคิดอยู่",
+      wukongOpenConsole: "Open Origin console",
+      wukongCheckAgain: "Check again",
+      wukongThinking: "Still on the chip",
       wukongDoneTitle: "Real quantum fridge",
       wukongDoneSub: "From the real chip, it's noisy",
-      wukongPasteId: "วาง Job ID ที่มีอยู่",
+      wukongPasteId: "Paste a job id you already have",
       wukongParseFail: "The chip finished, but the app could not fully parse the result format",
       wukongChipId: "WK_C180",
       wukongRawLabel: "raw payload",
-      wukongMismatch: "จ็อบนี้เป็นคนละวงจร — ไม่แปะผลทับ"
+      wukongMismatch: "This job is a different circuit — bars stay off"
     },
     th: {
       title: "ทดลองควอนตัม.com",
@@ -167,9 +167,9 @@
       waitPhrases: ["กำลังสเก็ตช์วงจรของเล่น", "ยังคิดอยู่", "กำลังย่อให้เหลือ 1–4 คิวบิต"],
       examplesLabel: "แตะบรรทัด — ใส่ในกล่องอย่างเดียว",
       examples: [
-        "tiny 1-qubit toy: dog or cat? (not a real classifier)",
+        "ของเล่น 1 คิวบิต: หมาหรือแมว? (ไม่ใช่ตัวแยกจริง)",
         "ทำวงจรที่แมวชโรดิงเงอร์ตัดสินใจไม่ได้",
-        "smallest circuit that shows why two Hadamards can undo each other"
+        "วงจรเล็กสุดที่โชว์ว่า Hadamard สองทีกลับไปจุดเดิม"
       ],
       proxyConnected: "พร็อกซีติด",
       proxyMissing: "พร็อกซีหลุด",
@@ -916,14 +916,15 @@
 
   function ketTooltip(bits, analog) {
     var k = String(bits || "");
+    var en = state.lang === "en";
     if (analog.kind === "bell") {
-      if (/^0+$/.test(k)) return "|" + k + "| = ทั้งคู่เงียบพร้อมกัน";
-      if (/^1+$/.test(k)) return "|" + k + "| = ทั้งคู่ตื่นพร้อมกัน";
-      return "|" + k + "| = ตื่นคนละใบ = ความสัมพันธ์พังหรือ noise";
+      if (/^0+$/.test(k)) return en ? ("|" + k + "| = both quiet together") : ("|" + k + "| = ทั้งคู่เงียบพร้อมกัน");
+      if (/^1+$/.test(k)) return en ? ("|" + k + "| = both awake together") : ("|" + k + "| = ทั้งคู่ตื่นพร้อมกัน");
+      return en ? ("|" + k + "| = they disagree = the link broke, or noise") : ("|" + k + "| = ตื่นคนละใบ = ความสัมพันธ์พังหรือ noise");
     }
     if (analog.kind === "grover") {
-      if (/^1+$/.test(k)) return "|" + k + "| = เจอของที่ทำเครื่องหมาย";
-      return "|" + k + "| = ยังหาไม่เจอ";
+      if (/^1+$/.test(k)) return en ? ("|" + k + "| = found the marked one") : ("|" + k + "| = เจอของที่ทำเครื่องหมาย");
+      return en ? ("|" + k + "| = not found yet") : ("|" + k + "| = ยังหาไม่เจอ");
     }
     if (analog.stateLabels && analog.n === 1 && analog.stateLabels[k]) {
       return "|" + k + "| = " + analog.stateLabels[k];
@@ -989,43 +990,54 @@
     // HARD-BOUND to the circuit on screen — never leftover Bell/HW percents.
     var kind = screenCircuitKind(pack);
     var isDogCat = kind === "pets";
+    var en = state.lang === "en";
     if (kind === "bell") {
-      lines.push("คู่เบลล์: สองใบต้องออกหน้าเดียวกัน");
-      lines.push("|" + z + "| เงียบด้วยกัน หรือ |" + o + "| ตื่นด้วยกัน คือคำตอบ");
-      lines.push("|01| / |10| = ตื่นคนละใบ = ความสัมพันธ์พังหรือ noise");
+      lines.push(en ? "Bell pair: both sides have to match" : "คู่เบลล์: สองใบต้องออกหน้าเดียวกัน");
+      lines.push(en
+        ? ("|" + z + "| quiet together or |" + o + "| awake together is the answer")
+        : ("|" + z + "| เงียบด้วยกัน หรือ |" + o + "| ตื่นด้วยกัน คือคำตอบ"));
+      lines.push(en
+        ? "|01| / |10| = they disagree = the link broke, or noise"
+        : "|01| / |10| = ตื่นคนละใบ = ความสัมพันธ์พังหรือ noise");
     } else if (kind === "grover") {
-      lines.push("โกรเวอร์ของเล่น: หาของที่ทำเครื่องหมาย");
-      lines.push("เจอ = แท่งที่ทำเครื่อง (|" + o + "|)");
-      lines.push("ยังไม่เจอ = แท่งอื่น");
+      lines.push(en ? "Grover toy: find the marked one" : "โกรเวอร์ของเล่น: หาของที่ทำเครื่องหมาย");
+      lines.push(en ? ("Found = the marked bar (|" + o + "|)") : ("เจอ = แท่งที่ทำเครื่อง (|" + o + "|)"));
+      lines.push(en ? "Not yet = the other bars" : "ยังไม่เจอ = แท่งอื่น");
     } else if (isDogCat) {
-      lines.push("หมาหรือแมว");
+      lines.push(en ? "Dog or cat" : "หมาหรือแมว");
       if (analog.stateLabels && analog.stateLabels["0"] && analog.stateLabels["1"]) {
-        lines.push("|0| = " + analog.stateLabels["0"] + " · |1| = " + analog.stateLabels["1"] + " คือคำตอบ");
+        lines.push(en
+          ? ("|0| = " + analog.stateLabels["0"] + " · |1| = " + analog.stateLabels["1"] + " is the answer")
+          : ("|0| = " + analog.stateLabels["0"] + " · |1| = " + analog.stateLabels["1"] + " คือคำตอบ"));
       } else {
-        lines.push("แท่งที่ขึ้นคือหมาหรือแมว คือคำตอบ");
+        lines.push(en ? "The tall bar is dog or cat — that is the answer" : "แท่งที่ขึ้นคือหมาหรือแมว คือคำตอบ");
       }
-      lines.push("แท่งอื่นคือพลาดหรือ noise");
+      lines.push(en ? "Other bars are a miss, or noise" : "แท่งอื่นคือพลาดหรือ noise");
     } else if (kind === "super") {
-      lines.push("ซูเปอร์โพซิชันของเล่น");
-      lines.push("แท่งที่ขึ้นคือผลวัดได้");
-      lines.push("แท่งอื่นคือพลาดหรือ noise");
+      lines.push(en ? "A superposition toy" : "ซูเปอร์โพซิชันของเล่น");
+      lines.push(en ? "The tall bar is what you can measure" : "แท่งที่ขึ้นคือผลวัดได้");
+      lines.push(en ? "Other bars are a miss, or noise" : "แท่งอื่นคือพลาดหรือ noise");
     } else if (n === 1 && analog.stateLabels) {
-      var t1s = liveTitleWords(analog.title) || "วงจรนี้";
+      var t1s = liveTitleWords(analog.title) || (en ? "This circuit" : "วงจรนี้");
       lines.push(t1s);
-      lines.push("|0| = " + analog.stateLabels["0"] + " · |1| = " + analog.stateLabels["1"] + " คือคำตอบ");
-      lines.push("แท่งอื่นคือพลาดหรือ noise");
+      lines.push(en
+        ? ("|0| = " + analog.stateLabels["0"] + " · |1| = " + analog.stateLabels["1"] + " is the answer")
+        : ("|0| = " + analog.stateLabels["0"] + " · |1| = " + analog.stateLabels["1"] + " คือคำตอบ"));
+      lines.push(en ? "Other bars are a miss, or noise" : "แท่งอื่นคือพลาดหรือ noise");
     } else {
       var t1 = liveTitleWords(analog.title);
-      if (!t1) t1 = (pack && pack.id) || "วงจรนี้";
-      t1 = String(t1).replace(/q(?:ubit)?s?|ควิบิต|คิวบิต/gi, " ").replace(/\s+/g, " ").trim() || "วงจรนี้";
+      if (!t1) t1 = (pack && pack.id) || (en ? "This circuit" : "วงจรนี้");
+      t1 = String(t1).replace(/q(?:ubit)?s?|ควิบิต|คิวบิต/gi, " ").replace(/\s+/g, " ").trim() || (en ? "This circuit" : "วงจรนี้");
       lines.push(t1);
       if (n === 1) {
         var nm0 = (analog.names && analog.names[0]) || "";
-        lines.push("|0| = " + nm0 + " " + analog.offWord + " · |1| = " + nm0 + " " + analog.onWord + " คือคำตอบ");
+        lines.push(en
+          ? ("|0| = " + nm0 + " off · |1| = " + nm0 + " on is the answer")
+          : ("|0| = " + nm0 + " " + analog.offWord + " · |1| = " + nm0 + " " + analog.onWord + " คือคำตอบ"));
       } else {
-        lines.push("แท่งที่ขึ้นคือผลวัดของวงจรนี้");
+        lines.push(en ? "The tall bar is what this circuit measured" : "แท่งที่ขึ้นคือผลวัดของวงจรนี้");
       }
-      lines.push("แท่งอื่นคือพลาดหรือ noise");
+      lines.push(en ? "Other bars are a miss, or noise" : "แท่งอื่นคือพลาดหรือ noise");
     }
     return sanitizeStoryLines(lines);
   }
@@ -1036,12 +1048,12 @@
     card.className = "human-card";
     card.id = "humanCard";
     var h = document.createElement("h3");
-    h.textContent = "ภาษาคน — อ่านจอนี้ยังไง";
+    h.textContent = state.lang === "en" ? "Plain talk — how to read these bars" : "ภาษาคน — อ่านจอนี้ยังไง";
     card.appendChild(h);
-    var en = document.createElement("p");
-    en.className = "human-en";
-    en.textContent = "Plain talk — how to read these bars";
-    card.appendChild(en);
+    var gloss = document.createElement("p");
+    gloss.className = "human-en";
+    gloss.textContent = state.lang === "en" ? "ภาษาคน — อ่านจอนี้ยังไง" : "Plain talk — how to read these bars";
+    card.appendChild(gloss);
     var ul = document.createElement("ul");
     humanCardLines(pack, sim, analog).forEach(function (line) {
       var li = document.createElement("li");
@@ -1063,7 +1075,9 @@
     keys.forEach(function (k) { if ((sim.counts[k] || 0) > max) max = sim.counts[k]; });
     var live = document.createElement("p");
     live.className = "hist-live-tip";
-    live.textContent = "แตะ |" + (keys[0] || "00") + "⟩ เพื่ออ่านเป็นภาษาคน";
+    live.textContent = state.lang === "en"
+      ? ("Tap |" + (keys[0] || "00") + "⟩ for plain talk")
+      : ("แตะ |" + (keys[0] || "00") + "⟩ เพื่ออ่านเป็นภาษาคน");
     keys.forEach(function (k) {
       var c = sim.counts[k] || 0;
       var row = document.createElement("div");
@@ -2629,7 +2643,7 @@
 
   function wukongWaitLine(sec) {
     var st = (state.last && state.last.wukongStatus) ? String(state.last.wukongStatus) : "";
-    var think = t("wukongThinking") + " " + sec + "s — still thinking / not frozen";
+    var think = t("wukongThinking") + " · " + sec + "s — " + t("stillThinking");
     return st ? (st + " · " + think) : think;
   }
 
