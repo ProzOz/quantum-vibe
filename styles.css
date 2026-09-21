@@ -863,6 +863,7 @@ pre {
 .wukong-extras .btn { min-height: 48px; font-weight: 600; }
 .confirm-actions .btn { min-height: 52px; font-size: 1.05rem; }
 
+.wukong-actions { margin: 4px 0 14px; }
 .btn.wukong-fire {
   display: inline-flex;
   flex-direction: column;

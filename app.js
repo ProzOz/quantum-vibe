@@ -1125,6 +1125,7 @@
     state.last = packFromDemo(id, demo, sim);
     attachSavedWukong(state.last);
     renderResult(state.last);
+    revealResults();
     renderChips();
   }
 
@@ -1139,6 +1140,7 @@
     fb.className = "fallback";
     fb.innerHTML = "<strong>" + t("fallback") + "</strong>";
     root.appendChild(fb);
+    revealResults();
     $("btnRegen").disabled = true;
     $("btnCopy").disabled = true;
   }
@@ -1218,6 +1220,7 @@
     };
     attachSavedWukong(state.last);
     renderResult(state.last);
+    revealResults();
     renderChips();
   }
 
@@ -1253,6 +1256,7 @@
     }
     tick();
     state.waitTimer = setInterval(tick, 1000);
+    revealResults();
   }
 
   function runPrompt() {
@@ -1342,6 +1346,13 @@
     return body;
   }
 
+  function revealResults() {
+    var el = $("results");
+    if (!el || !el.scrollIntoView) return;
+    try { el.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    catch (e) { el.scrollIntoView(true); }
+  }
+
   function renderResult(pack) {
     if (!pack) return;
     var sim = pack.sim, lang = state.lang;
@@ -1396,6 +1407,25 @@
       root.appendChild(pnote);
     }
 
+    var wkRow = document.createElement("div");
+    wkRow.className = "actions wukong-actions";
+    var wkBtn = document.createElement("button");
+    wkBtn.type = "button";
+    wkBtn.className = "btn wukong-fire";
+    wkBtn.id = "btnWukong";
+    var wkLab = document.createElement("span");
+    wkLab.className = "wukong-fire-label";
+    wkLab.textContent = t("wukongBtn");
+    var wkChip = document.createElement("span");
+    wkChip.className = "wukong-fire-chip";
+    wkChip.textContent = t("wukongChipId") || DEFAULT_DEVICE;
+    wkBtn.appendChild(wkLab);
+    wkBtn.appendChild(wkChip);
+    wkBtn.disabled = !!state.wukongBusy;
+    wkBtn.addEventListener("click", onWukongClick);
+    wkRow.appendChild(wkBtn);
+    root.appendChild(wkRow);
+
     var grid = document.createElement("div");
     grid.className = "grid";
 
@@ -1433,26 +1463,6 @@
     grid.appendChild(side);
     root.appendChild(grid);
     root.appendChild(renderHumanCard(pack, sim));
-
-    var wkRow = document.createElement("div");
-    wkRow.className = "actions";
-    wkRow.style.marginTop = "12px";
-    var wkBtn = document.createElement("button");
-    wkBtn.type = "button";
-    wkBtn.className = "btn wukong-fire";
-    wkBtn.id = "btnWukong";
-    var wkLab = document.createElement("span");
-    wkLab.className = "wukong-fire-label";
-    wkLab.textContent = t("wukongBtn");
-    var wkChip = document.createElement("span");
-    wkChip.className = "wukong-fire-chip";
-    wkChip.textContent = t("wukongChipId") || DEFAULT_DEVICE;
-    wkBtn.appendChild(wkLab);
-    wkBtn.appendChild(wkChip);
-    wkBtn.disabled = !!state.wukongBusy;
-    wkBtn.addEventListener("click", onWukongClick);
-    wkRow.appendChild(wkBtn);
-    root.appendChild(wkRow);
 
     $("btnRegen").disabled = false;
     $("btnCopy").disabled = false;
@@ -2366,7 +2376,7 @@
     inp.autocomplete = "off";
     inp.spellcheck = false;
     inp.value = (pack && pack.wukongJobId) || "";
-    inp.placeholder = "17838046626247382436E0799D943523";
+    inp.placeholder = state.lang === "th" ? "วางรหัสจ็อบ" : "Paste a job id";
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn primary";
