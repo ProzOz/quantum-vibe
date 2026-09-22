@@ -16,9 +16,10 @@ import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
+import posixpath
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.parse import unquote, urlparse
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 
 ROOT = Path(__file__).resolve().parent
@@ -33,9 +34,42 @@ MAX_TOKENS = 800
 PLAN_TIMEOUT_S = 25
 PLAN_RATE_WINDOW_S = 60
 PLAN_RATE_MAX = 8
+# Process-wide ceiling. Per-IP buckets are spoofable and do not span replicas.
+PLAN_RATE_GLOBAL_MAX = int(os.environ.get("PLAN_RATE_GLOBAL_MAX", "40"))
+ORIGIN_RATE_MAX = 12
+ORIGIN_RATE_GLOBAL_MAX = int(os.environ.get("ORIGIN_RATE_GLOBAL_MAX", "40"))
+ORIGIN_SLOTS = 4
+ORIGIN_JOB_CAP = 200
+MAX_QASM = 12000
+MAX_DEVICE = 64
+MAX_JOB_ID = 128
 SERVER_KEY_ENVS = ("MOONSHOT_API_KEY", "KIMI_API_KEY")
 _PLAN_HITS: dict[str, list[float]] = {}
+_PLAN_GLOBAL: list[float] = []
+_ORIGIN_HITS: dict[str, list[float]] = {}
+_ORIGIN_GLOBAL: list[float] = []
 _PLAN_HITS_LOCK = threading.Lock()
+_ORIGIN_HITS_LOCK = threading.Lock()
+_ORIGIN_SLOTS = threading.BoundedSemaphore(ORIGIN_SLOTS)
+# Files the browser is allowed to fetch. Everything else 404s, including
+# Dockerfile (Coolify may inject build-args into it), tests, and listings.
+PUBLIC_PATHS = frozenset(
+    {
+        "/",
+        "/index.html",
+        "/app.js",
+        "/sim.js",
+        "/demos.js",
+        "/validate.js",
+        "/styles.css",
+        "/header-mobile.css",
+        "/fonts/Sarabun-Regular.ttf",
+        "/fonts/Sarabun-SemiBold.ttf",
+        "/logos/burapha-seal.png",
+        "/logos/piboonbumpen.png",
+        "/logos/scius-buu-mark.png",
+    }
+)
 ALLOWED_OPS = frozenset(
     ("H", "X", "Y", "Z", "S", "T", "CX", "CZ", "SWAP", "RX", "RY", "RZ")
 )
@@ -513,6 +547,18 @@ def _key_fp(key: str) -> str:
     return hashlib.sha256((key or "").encode("utf-8")).hexdigest()[:16]
 
 
+def _store_origin_job(jid: str, rec: dict) -> None:
+    """Remember a task for polling. Cap the map so a flood cannot grow it forever."""
+    with ORIGIN_JOBS_LOCK:
+        ORIGIN_JOBS.pop(jid, None)
+        ORIGIN_JOBS[jid] = rec
+        while len(ORIGIN_JOBS) > ORIGIN_JOB_CAP:
+            old = next(iter(ORIGIN_JOBS))
+            if old == jid:
+                break
+            ORIGIN_JOBS.pop(old, None)
+
+
 def _console_url(job_id: str) -> str:
     return ORIGIN_CONSOLE_JOB + _as_str(job_id).strip()
 
@@ -559,15 +605,19 @@ def origin_sample(key: str, qasm: str, device_id: str, shots: int, n_qubits: int
     k = (key or "").strip()
     if not k:
         return {"ok": False, "error": "Origin API key is empty"}
+    qasm = _as_str(qasm).strip()
+    if not qasm:
+        return {"ok": False, "error": "OpenQASM is empty"}
+    if len(qasm) > MAX_QASM:
+        return {"ok": False, "error": "OpenQASM is too long"}
+    device_id = (_as_str(device_id).strip() or DEFAULT_DEVICE_ORIGIN)
+    if len(device_id) > MAX_DEVICE:
+        return {"ok": False, "error": "device id is too long"}
     if not qpanda_present():
         return {
             "ok": False,
             "error": "qpanda3-runtime is not installed in this Python. pip install qpanda3-runtime pyqpanda3",
         }
-    qasm = _as_str(qasm).strip()
-    if not qasm:
-        return {"ok": False, "error": "OpenQASM is empty"}
-    device_id = (_as_str(device_id).strip() or DEFAULT_DEVICE_ORIGIN)
     try:
         shots_n = int(shots)
     except Exception:
@@ -615,14 +665,16 @@ def origin_sample(key: str, qasm: str, device_id: str, shots: int, n_qubits: int
         return {"ok": False, "error": "Origin sample returned no job id: %s" % sanitize_error(e, k)}
     if not job_id:
         return {"ok": False, "error": "Origin sample returned no job id"}
-    with ORIGIN_JOBS_LOCK:
-        ORIGIN_JOBS[job_id] = {
+    _store_origin_job(
+        job_id,
+        {
             "task": task,
             "n": n,
             "device": device_id,
             "shots": shots_n,
             "key_fp": _key_fp(k),
-        }
+        },
+    )
     return {
         "ok": True,
         "job_id": job_id,
@@ -666,7 +718,6 @@ def _attach_existing_origin_job(key: str, job_id: str, n_qubits: Any) -> dict:
         svc.login(k)
         # Attach existing task by id. NEVER svc.sample().
         # SDK: RuntimeService.get_task(task_id)
-        # Source: C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\qpanda3_runtime\runtime_service.py
         if not hasattr(svc, "get_task"):
             return {
                 "ok": False,
@@ -691,8 +742,7 @@ def _attach_existing_origin_job(key: str, job_id: str, n_qubits: Any) -> dict:
         "shots": DEFAULT_SHOTS_ORIGIN,
         "key_fp": _key_fp(k),
     }
-    with ORIGIN_JOBS_LOCK:
-        ORIGIN_JOBS[jid] = rec
+    _store_origin_job(jid, rec)
     return {"ok": True, "rec": rec}
 
 
@@ -704,8 +754,19 @@ def origin_job(key: str, job_id: Any, n_qubits: Any) -> dict:
     jid = _as_str(job_id).strip()
     if not jid:
         return {"ok": False, "error": "job_id is empty"}
+    if len(jid) > MAX_JOB_ID:
+        return {"ok": False, "error": "job_id is too long"}
+    fp = _key_fp(k)
     with ORIGIN_JOBS_LOCK:
         rec = ORIGIN_JOBS.get(jid)
+    # Cached tasks skip Origin's own auth. A different key must not read them.
+    if rec is not None and rec.get("key_fp") != fp:
+        return {
+            "ok": False,
+            "error": "Could not read this Origin job with the key in Settings.",
+            "job_id": jid,
+            "console_url": _console_url(jid),
+        }
     if rec is None:
         attached = _attach_existing_origin_job(k, jid, n_qubits)
         if not attached.get("ok"):
@@ -736,7 +797,6 @@ def origin_job(key: str, job_id: Any, n_qubits: Any) -> dict:
     task = rec["task"]
     try:
         # try_get_result is one HTTP query (single_query=True), not wait-until-done.
-        # Source: C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\qpanda3_runtime\task\qtask_manager.py
         if hasattr(task, "try_get_result"):
             results, finished, _progress = task.try_get_result(timeout=POLL_QUERY_TIMEOUT_S)
         else:
@@ -822,37 +882,135 @@ def resolve_moonshot_key(visitor: Any) -> tuple[str, str]:
 def reset_plan_rate_limit() -> None:
     with _PLAN_HITS_LOCK:
         _PLAN_HITS.clear()
+        _PLAN_GLOBAL.clear()
+    with _ORIGIN_HITS_LOCK:
+        _ORIGIN_HITS.clear()
+        _ORIGIN_GLOBAL.clear()
 
 
 def client_ip(handler: SimpleHTTPRequestHandler) -> str:
+    """Identity for rate limits.
+
+    Use the rightmost X-Forwarded-For hop. That is the address the closest
+    reverse proxy appended. The leftmost hop is whatever the client sent, so
+    it is not a rate-limit key. Fall back to X-Real-IP, then the socket peer.
+    """
     xff = (handler.headers.get("X-Forwarded-For") or "").strip()
     if xff:
-        return xff.split(",")[0].strip()[:64] or "unknown"
+        parts = [p.strip() for p in xff.split(",") if p.strip()]
+        if parts:
+            return parts[-1][:64]
     real = (handler.headers.get("X-Real-IP") or "").strip()
     if real:
         return real[:64]
     try:
-        return str(handler.client_address[0])
+        return str(handler.client_address[0])[:64]
     except Exception:
         return "unknown"
 
 
-def plan_rate_ok(ip: str) -> bool:
-    """Per-IP sliding window for POST /plan. True = allow this request."""
+def _rate_ok(
+    lock: threading.Lock,
+    buckets: dict[str, list[float]],
+    global_hits: list[float],
+    ip: str,
+    per_ip: int,
+    global_max: int,
+) -> bool:
+    """Sliding window. True = allow. Global cap cannot be bypassed by spoofing IP."""
     now = time.time()
     key = (ip or "unknown")[:64]
-    with _PLAN_HITS_LOCK:
-        hits = [t for t in _PLAN_HITS.get(key, []) if now - t < PLAN_RATE_WINDOW_S]
-        if len(_PLAN_HITS) > 4000 and key not in _PLAN_HITS:
-            stale = [k for k, ts in _PLAN_HITS.items() if not ts or now - ts[-1] > PLAN_RATE_WINDOW_S]
+    with lock:
+        g = [t for t in global_hits if now - t < PLAN_RATE_WINDOW_S]
+        if len(g) >= global_max:
+            global_hits[:] = g
+            return False
+        hits = [t for t in buckets.get(key, []) if now - t < PLAN_RATE_WINDOW_S]
+        if len(buckets) > 4000 and key not in buckets:
+            stale = [k for k, ts in buckets.items() if not ts or now - ts[-1] > PLAN_RATE_WINDOW_S]
             for k in stale[:500]:
-                _PLAN_HITS.pop(k, None)
-        if len(hits) >= PLAN_RATE_MAX:
-            _PLAN_HITS[key] = hits
+                buckets.pop(k, None)
+        if len(hits) >= per_ip:
+            buckets[key] = hits
+            global_hits[:] = g
             return False
         hits.append(now)
-        _PLAN_HITS[key] = hits
+        g.append(now)
+        buckets[key] = hits
+        global_hits[:] = g
         return True
+
+
+def plan_rate_ok(ip: str) -> bool:
+    """Per-IP plus process-wide ceiling for POST /plan."""
+    return _rate_ok(
+        _PLAN_HITS_LOCK,
+        _PLAN_HITS,
+        _PLAN_GLOBAL,
+        ip,
+        PLAN_RATE_MAX,
+        PLAN_RATE_GLOBAL_MAX,
+    )
+
+
+def origin_rate_ok(ip: str) -> bool:
+    """Per-IP plus process-wide ceiling for Origin routes."""
+    return _rate_ok(
+        _ORIGIN_HITS_LOCK,
+        _ORIGIN_HITS,
+        _ORIGIN_GLOBAL,
+        ip,
+        ORIGIN_RATE_MAX,
+        ORIGIN_RATE_GLOBAL_MAX,
+    )
+
+
+def origin_slot_enter() -> bool:
+    return _ORIGIN_SLOTS.acquire(blocking=False)
+
+
+def origin_slot_leave() -> None:
+    try:
+        _ORIGIN_SLOTS.release()
+    except ValueError:
+        return
+
+
+def request_path(raw: str) -> str:
+    path = unquote(urlparse(raw or "/").path or "/")
+    path = posixpath.normpath(path)
+    if not path.startswith("/"):
+        path = "/" + path
+    return path
+
+
+def is_public_asset(path: str) -> bool:
+    return path in PUBLIC_PATHS
+
+
+def _redact(obj: Any, secrets: list[str], depth: int = 0) -> Any:
+    """Strip API keys from anything we send back to the browser."""
+    if depth > 8:
+        return obj if not isinstance(obj, str) else obj[:2000]
+    live = [s for s in secrets if isinstance(s, str) and len(s) >= 8]
+    if isinstance(obj, str):
+        out = obj
+        for s in live:
+            if s in out:
+                out = out.replace(s, "***")
+        return out
+    if isinstance(obj, dict):
+        return {str(k): _redact(v, live, depth + 1) for k, v in list(obj.items())[:120]}
+    if isinstance(obj, (list, tuple)):
+        return [_redact(v, live, depth + 1) for v in list(obj)[:400]]
+    return obj
+
+
+def scrub_result(result: dict, *secrets: str) -> dict:
+    cleaned = _redact(result, [s for s in secrets if isinstance(s, str)])
+    if isinstance(cleaned, dict):
+        return cleaned
+    return result
 
 
 def as_string(v: Any) -> str:
@@ -1025,6 +1183,16 @@ def normalize_model(model: Any) -> str:
     return m
 
 
+class _NoRedirect(HTTPRedirectHandler):
+    """Never follow 3xx. urllib would otherwise resend Authorization to the target."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise HTTPError(req.full_url, code, "redirect blocked", headers, fp)
+
+
+_MOONSHOT_OPENER = build_opener(_NoRedirect)
+
+
 def moonshot_chat(prompt: str, endpoint: str, model: str, key: str) -> dict:
     """Call Moonshot once. Returns {ok, content} or {ok: False, error, status}."""
     payload = {
@@ -1046,7 +1214,7 @@ def moonshot_chat(prompt: str, endpoint: str, model: str, key: str) -> dict:
     def _do(body: bytes) -> dict:
         req = Request(endpoint, data=body, headers=headers, method="POST")
         try:
-            with urlopen(req, timeout=PLAN_TIMEOUT_S) as resp:
+            with _MOONSHOT_OPENER.open(req, timeout=PLAN_TIMEOUT_S) as resp:
                 raw = resp.read().decode("utf-8", errors="replace")
         except HTTPError as e:
             err_body = ""
@@ -1058,7 +1226,7 @@ def moonshot_chat(prompt: str, endpoint: str, model: str, key: str) -> dict:
                 "ok": False,
                 "error": "Moonshot HTTP %s" % e.code,
                 "status": e.code,
-                "detail": err_body,
+                "detail": sanitize_error(err_body, key),
             }
         except URLError as e:
             return {"ok": False, "error": "Moonshot network error", "status": 502}
@@ -1094,6 +1262,8 @@ def plan_from_kimi(prompt: str, endpoint: str, model: str, key: str) -> dict:
         result = moonshot_chat(prompt, endpoint, model, key)
         if not result.get("ok"):
             last_err = result.get("error") or last_err
+            if result.get("status") in (301, 302, 303, 307, 308):
+                return {"ok": False, "error": "Moonshot redirect blocked", "http": 502}
             # Retry network-ish failures only.
             if result.get("status") in (400, 401, 403, 404, 422):
                 return {"ok": False, "error": last_err, "http": 502}
@@ -1121,8 +1291,28 @@ def plan_from_kimi(prompt: str, endpoint: str, model: str, key: str) -> dict:
 
 
 class Handler(SimpleHTTPRequestHandler):
+    server_version = "quantum-vibe"
+    sys_version = ""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
+
+    def end_headers(self) -> None:
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("Content-Security-Policy", "frame-ancestors 'none'")
+        super().end_headers()
+
+    def list_directory(self, path):
+        self.send_error(404, "Not found")
+        return None
+
+    def send_head(self):
+        if not is_public_asset(request_path(self.path)):
+            self.send_error(404, "Not found")
+            return None
+        return super().send_head()
 
     def log_message(self, fmt: str, *args: Any) -> None:
         # Path + status only. Never log bodies, headers, or env.
@@ -1183,13 +1373,6 @@ class Handler(SimpleHTTPRequestHandler):
         if not isinstance(body, dict):
             self._send_json(400, {"error": "request body must be a JSON object"})
             return
-        ip = client_ip(self)
-        if not plan_rate_ok(ip):
-            self._send_json(
-                429,
-                {"error": "Slow down — too many Kimi requests from this network. Try again in a minute."},
-            )
-            return
         visitor_key = body.get("moonshot_key")
         moonshot_key, key_source = resolve_moonshot_key(visitor_key)
         if not moonshot_key:
@@ -1219,6 +1402,15 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if key_source == "server":
             model = DEFAULT_MODEL
+        # Count only a real Kimi attempt. Empty boxes and bad URLs must not
+        # lock the shared key for everyone else on this process.
+        ip = client_ip(self)
+        if not plan_rate_ok(ip):
+            self._send_json(
+                429,
+                {"error": "Slow down — too many Kimi requests from this network. Try again in a minute."},
+            )
+            return
         try:
             result = plan_from_kimi(prompt, endpoint, model, moonshot_key)
         except Exception:
@@ -1232,9 +1424,22 @@ class Handler(SimpleHTTPRequestHandler):
                 err = "Shared Kimi was rejected. Paste your own Moonshot key in Settings."
             self._send_json(code, {"error": err})
             return
-        self._send_json(200, result["plan"])
+        self._send_json(200, scrub_result(result["plan"], moonshot_key))
 
-
+    def _begin_origin(self) -> bool:
+        if not origin_rate_ok(client_ip(self)):
+            self._send_json(
+                429,
+                {"ok": False, "error": "Slow down — too many Origin requests. Try again in a minute."},
+            )
+            return False
+        if not origin_slot_enter():
+            self._send_json(
+                429,
+                {"ok": False, "error": "Origin is busy. Try again in a few seconds."},
+            )
+            return False
+        return True
 
     def _origin_body(self) -> dict | None:
         try:
@@ -1248,70 +1453,86 @@ class Handler(SimpleHTTPRequestHandler):
         return body
 
     def _origin_test(self) -> None:
-        body = self._origin_body()
-        if body is None:
-            return
-        key = body.get("key")
-        if key is None:
-            key = ""
-        if not isinstance(key, str):
-            self._send_json(400, {"error": "key must be a string"})
+        if not self._begin_origin():
             return
         try:
-            result = origin_test(key)
-        except Exception as e:
-            self._send_json(502, {"ok": False, "error": sanitize_error(e, key)})
-            return
-        code = 200 if result.get("ok") else 400
-        self._send_json(code, result)
+            body = self._origin_body()
+            if body is None:
+                return
+            key = body.get("key")
+            if key is None:
+                key = ""
+            if not isinstance(key, str):
+                self._send_json(400, {"error": "key must be a string"})
+                return
+            try:
+                result = origin_test(key)
+            except Exception as e:
+                self._send_json(502, {"ok": False, "error": sanitize_error(e, key)})
+                return
+            code = 200 if result.get("ok") else 400
+            self._send_json(code, scrub_result(result, key, server_moonshot_key()))
+        finally:
+            origin_slot_leave()
 
     def _origin_sample(self) -> None:
-        body = self._origin_body()
-        if body is None:
-            return
-        key = body.get("key")
-        if key is None:
-            key = ""
-        if not isinstance(key, str):
-            self._send_json(400, {"error": "key must be a string"})
-            return
-        qasm = body.get("qasm")
-        device = body.get("device") or DEFAULT_DEVICE_ORIGIN
-        shots = body.get("shots")
-        n = body.get("qubits")
-        if n is None:
-            n = body.get("n")
-        if not isinstance(qasm, str):
-            self._send_json(400, {"error": "qasm must be a string"})
-            return
-        if not isinstance(device, str):
-            self._send_json(400, {"error": "device must be a string"})
+        if not self._begin_origin():
             return
         try:
-            result = origin_sample(key, qasm, device, shots or DEFAULT_SHOTS_ORIGIN, n)
-        except Exception as e:
-            self._send_json(502, {"ok": False, "error": sanitize_error(e, key)})
-            return
-        code = 200 if result.get("ok") else 400
-        self._send_json(code, result)
+            body = self._origin_body()
+            if body is None:
+                return
+            key = body.get("key")
+            if key is None:
+                key = ""
+            if not isinstance(key, str):
+                self._send_json(400, {"error": "key must be a string"})
+                return
+            qasm = body.get("qasm")
+            device = body.get("device") or DEFAULT_DEVICE_ORIGIN
+            shots = body.get("shots")
+            n = body.get("qubits")
+            if n is None:
+                n = body.get("n")
+            if not isinstance(qasm, str):
+                self._send_json(400, {"error": "qasm must be a string"})
+                return
+            if not isinstance(device, str):
+                self._send_json(400, {"error": "device must be a string"})
+                return
+            try:
+                result = origin_sample(key, qasm, device, shots or DEFAULT_SHOTS_ORIGIN, n)
+            except Exception as e:
+                self._send_json(502, {"ok": False, "error": sanitize_error(e, key)})
+                return
+            code = 200 if result.get("ok") else 400
+            self._send_json(code, scrub_result(result, key, server_moonshot_key()))
+        finally:
+            origin_slot_leave()
 
     def _origin_job(self) -> None:
-        body = self._origin_body()
-        if body is None:
-            return
-        key = body.get("key")
-        if key is None:
-            key = ""
-        if not isinstance(key, str):
-            self._send_json(400, {"error": "key must be a string"})
+        if not self._begin_origin():
             return
         try:
-            result = origin_job(key, body.get("job_id"), body.get("qubits") if body.get("qubits") is not None else body.get("n"))
-        except Exception as e:
-            self._send_json(502, {"ok": False, "error": sanitize_error(e, key)})
-            return
-        code = 200 if result.get("ok") else 400
-        self._send_json(code, result)
+            body = self._origin_body()
+            if body is None:
+                return
+            key = body.get("key")
+            if key is None:
+                key = ""
+            if not isinstance(key, str):
+                self._send_json(400, {"error": "key must be a string"})
+                return
+            try:
+                n_q = body.get("qubits") if body.get("qubits") is not None else body.get("n")
+                result = origin_job(key, body.get("job_id"), n_q)
+            except Exception as e:
+                self._send_json(502, {"ok": False, "error": sanitize_error(e, key)})
+                return
+            code = 200 if result.get("ok") else 400
+            self._send_json(code, scrub_result(result, key, server_moonshot_key()))
+        finally:
+            origin_slot_leave()
 
 
 def main() -> None:

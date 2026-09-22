@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#070910">
+  <meta name="description" content="ทดลองควอนตัม — ของเล่น 1–4 คิวบิตบนมือถือ เทียบซิมในเครื่องกับชิปตู้เย็นจริง">
   <title>ทดลองควอนตัม.com · Try Quantum</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="header-mobile.css">
@@ -28,8 +30,8 @@
       </div>
       <nav class="header-tools" aria-label="Language and settings">
         <a href="https://เรียนควอนตัม.com" target="_blank" rel="noopener" class="sister-link" id="sisterLink"></a>
-        <button type="button" class="lang" id="btnEn" aria-pressed="true">EN</button>
-        <button type="button" class="lang" id="btnTh" aria-pressed="false">TH</button>
+        <button type="button" class="lang" id="btnTh" aria-pressed="true">TH</button>
+        <button type="button" class="lang" id="btnEn" aria-pressed="false">EN</button>
         <button type="button" class="about-btn" id="btnSettings">Settings</button>
         <button type="button" class="about-btn" id="btnAbout">About</button>
       </nav>
@@ -57,19 +59,19 @@
   </div>
 
   <div class="drawer-backdrop" id="about">
-    <aside class="drawer" role="dialog" aria-labelledby="aboutInner">
+    <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="aboutInner">
       <div id="aboutInner"></div>
     </aside>
   </div>
 
   <div class="drawer-backdrop" id="settings">
-    <aside class="drawer" role="dialog" aria-labelledby="settingsInner">
+    <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="settingsInner">
       <div id="settingsInner"></div>
     </aside>
   </div>
 
   <div class="drawer-backdrop" id="wukongModal">
-    <aside class="confirm-card" role="dialog" aria-labelledby="wukongModalTitle">
+    <aside class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="wukongModalTitle">
       <div id="wukongModalInner"></div>
     </aside>
   </div>

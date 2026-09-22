@@ -32,9 +32,9 @@ header.appbar {
 }
 .brand h1 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.2;
   letter-spacing: 0;
   white-space: nowrap;
   word-break: keep-all;
@@ -84,11 +84,24 @@ header.appbar {
 
 @media (max-width: 720px) {
   .header-seal { height: 22px; }
-  .brand h1 { font-size: 1.05rem; }
+  .brand h1 { font-size: 1.28rem; }
   .sister-link { display: none; }
   .lang, .about-btn {
-    padding: 0 10px;
-    font-size: 0.85rem;
+    padding: 0 12px;
+    font-size: 0.92rem;
+  }
+  .actions { flex-direction: column; }
+  .actions .btn { width: 100%; }
+  .honesty { font-size: 0.95rem; }
+  .confirm-card {
+    max-height: calc(100dvh - 24px);
+    overflow: auto;
+    width: min(560px, calc(100% - 20px));
+    padding: 22px 18px calc(18px + env(safe-area-inset-bottom));
+  }
+  .drawer {
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    height: 100dvh;
   }
 }
 

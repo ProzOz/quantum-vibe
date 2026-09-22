@@ -10,3 +10,10 @@ about-desktop.png
 about-phone.png
 logos/_src
 nginx.conf
+Dockerfile
+README.md
+AUDIT.md
+proof
+test-proxy.py
+test-bind.js
+dancing-qubits-demo.webp
