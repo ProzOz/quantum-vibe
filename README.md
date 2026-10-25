@@ -76,4 +76,4 @@ After merge, owner **Redeploys** Coolify with the new app pointing at this repo.
 
 The KMIDS logo in the About drawer only shows where Potter studies. This is not an official KMIDS project.
 
-This does not claim quantum advantage, real users, or KMITL admission.
+This does not claim quantum advantage, real users, or university admission, and it is not an official KMIDS, SCiUS, or Burapha University project.
