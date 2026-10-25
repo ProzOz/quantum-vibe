@@ -22,6 +22,7 @@
     en: {
       title: "ทดลองควอนตัม.com",
       sub: "Laptop sim vs a real fridge chip",
+      teamLabel: "SCiUS Burapha University X KMITL International Demonstration School",
       honesty: "Teaching toys, 1–4 qubits, on your laptop. Real chips are slow and noisy — they do not beat a home computer.",
       promptLabel: "What should this tiny circuit pretend to be?",
       placeholder: "dog or cat, Schrödinger’s cat, two Hadamards…",
@@ -147,6 +148,7 @@
     th: {
       title: "ทดลองควอนตัม.com",
       sub: "ซิมในแล็ป vs ชิปตู้เย็นจริง",
+      teamLabel: "วมว มหาวิทยาลัยบูรพา X สาธิตนานาชาติลาดกระบัง สจล",
       honesty: "ของเล่น 1–4 คิวบิตบนเครื่องเธอ ชิปจริงช้า มี noise — ไม่ได้ชนะคอมบ้าน",
       promptLabel: "อยากให้วงจรจิ๋วนี้แกล้งเป็นอะไร",
       placeholder: "หมาหรือแมว, แมวชโรดิงเงอร์, Hadamard สองที…",
@@ -324,6 +326,12 @@
     $("titleTh").textContent = "ทดลองควอนตัม.com";
     $("titleEn").textContent = "Try Quantum";
     $("sub").textContent = t("sub");
+    var teamEl = $("teamLabel");
+    if (teamEl) {
+      teamEl.innerHTML = t("teamLabel").split(" X ").map(function (part) {
+        return "<span class='team-part'>" + escapeAttr(part) + "</span>";
+      }).join(" <span class='team-x'>X</span> ");
+    }
     $("honesty").textContent = t("honesty");
     $("sisterLink").textContent = t("sisterLink");
     $("labLine").innerHTML = "<a href='https://เรียนควอนตัม.com' target='_blank' rel='noopener'>" + t("labLine") + "</a>";
