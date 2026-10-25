@@ -76,6 +76,10 @@
       aboutTarget: "B.Eng. Robotics and AI, KMITL (target)",
       aboutMore: "อ่านเพิ่ม / more",
       aboutLinks: "เรียนควอนตัม.com",
+      contribTitle: "Contributors",
+      contribCreator: "creator",
+      contribCodev: "co-developer",
+      contribNote: "The school logo shows where Potter studies. This is not an official school project.",
       qeTitle: "Related project (credited, not absorbed)",
       qeName: "Quantum Experience / Quantum Physics Interactive",
       qeDevs: "Developers: ชลธี สุขวิวัฒนพร (Chonlatee Sukwiwattanaporn); ภวัต เอี่ยมสุภาพงษ์ (Pawat Iemsupapong)",
@@ -197,6 +201,10 @@
       aboutTarget: "B.Eng. Robotics and AI, KMITL (target)",
       aboutMore: "อ่านเพิ่ม / more",
       aboutLinks: "เรียนควอนตัม.com",
+      contribTitle: "ผู้พัฒนา",
+      contribCreator: "ผู้สร้าง",
+      contribCodev: "ผู้ร่วมพัฒนา",
+      contribNote: "โลโก้โรงเรียนแสดงว่า Potter เรียนที่ไหน ไม่ใช่โปรเจกต์อย่างเป็นทางการของโรงเรียน",
       qeTitle: "โปรเจกต์ที่เกี่ยวข้อง (ให้เครดิต ไม่ดูดเข้ามา)",
       qeName: "Quantum Experience / Quantum Physics Interactive",
       qeDevs: "ผู้พัฒนา: ชลธี สุขวิวัฒนพร (Chonlatee Sukwiwattanaporn); ภวัต เอี่ยมสุภาพงษ์ (Pawat Iemsupapong)",
@@ -404,6 +412,14 @@
       "<p class='about-target'>" + t("aboutTarget") + "</p>" +
       "<p class='muted about-endorsement'>" + t("aboutEndorsement") + "</p>" +
       "<p class='muted about-links'><a href='https://เรียนควอนตัม.com' target='_blank' rel='noopener'>" + t("aboutLinks") + "</a></p>" +
+      "<section class='contributors' aria-labelledby='contribTitle'>" +
+        "<h3 id='contribTitle'>" + t("contribTitle") + "</h3>" +
+        "<ul>" +
+          "<li>Ozone / Chonlatee Sukwiwattanaporn (<a href='https://github.com/ProzOz' target='_blank' rel='noopener'>@ProzOz</a>) — " + t("contribCreator") + "</li>" +
+          "<li>Thiradanai (Potter, KMIDS <img class='contrib-school' src='logos/kmids-logo.png' width='49' height='64' alt='KMIDS school logo'>, <a href='https://github.com/Thiradanai' target='_blank' rel='noopener'>@Thiradanai</a>) — " + t("contribCodev") + "</li>" +
+        "</ul>" +
+        "<p class='muted contrib-note'>" + t("contribNote") + "</p>" +
+      "</section>" +
       "<details class='about-more'>" +
         "<summary>" + t("aboutMore") + "</summary>" +
         "<div class='facts'><p>" + t("aboutSchool") + "</p>" +
