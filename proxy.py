@@ -66,6 +66,7 @@ PUBLIC_PATHS = frozenset(
         "/fonts/Sarabun-Regular.ttf",
         "/fonts/Sarabun-SemiBold.ttf",
         "/logos/burapha-seal.png",
+        "/logos/kmids-logo.png",
         "/logos/piboonbumpen.png",
         "/logos/scius-buu-mark.png",
     }

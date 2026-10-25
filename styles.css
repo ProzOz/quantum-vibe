@@ -1049,3 +1049,11 @@ details.wukong-raw pre {
   min-height: 1.2em;
 }
 .box.hist-box { overflow: visible; }
+
+/* Contributors (About drawer) */
+.contributors { font-size: 0.92rem; margin: 12px 0; }
+.contributors h3 { font-size: 1rem; margin: 0 0 4px; }
+.contributors ul { padding-left: 18px; margin: 0; }
+.contributors li { margin: 2px 0; }
+.contributors .contrib-school { height: 22px; width: auto; vertical-align: middle; }
+.contributors .contrib-note { font-size: 0.82rem; margin-top: 4px; }

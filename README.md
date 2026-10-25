@@ -69,4 +69,11 @@ Local sim is the default. After a circuit exists, **ยิงเข้า Wukong
 
 After merge, owner **Redeploys** Coolify with the new app pointing at this repo.
 
+## Contributors
+
+- **Ozone / Chonlatee Sukwiwattanaporn** ([@ProzOz](https://github.com/ProzOz)) — creator
+- **Thiradanai (Potter, KMIDS)** ([@Thiradanai](https://github.com/Thiradanai)) — co-developer
+
+The KMIDS logo in the About drawer only shows where Potter studies. This is not an official KMIDS project.
+
 This does not claim quantum advantage, real users, or KMITL admission.
