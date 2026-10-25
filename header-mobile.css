@@ -50,6 +50,18 @@ header.appbar {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.team-label {
+  order: 3;
+  flex: 1 1 100%;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.team-part { display: inline-block; max-width: 100%; }
+.team-x { color: var(--accent); font-weight: 600; padding: 0 2px; }
 .header-tools {
   display: flex;
   flex-wrap: wrap;
@@ -109,6 +121,8 @@ header.appbar {
   .header-identity {
     flex: 1 1 100%;
   }
+  .team-label { order: 1; font-size: 0.78rem; }
+  .header-tools { order: 2; }
   .header-tools {
     flex: 1 1 100%;
     margin-left: 0;
